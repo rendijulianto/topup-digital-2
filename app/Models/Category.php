@@ -9,16 +9,13 @@ class Kategori extends Model
 {
     use HasFactory;
 
-    // table name
     protected $table = 'kategori';
 
-    // fillable attrib
     protected $fillable = [
         'nama',
         'slug',
     ];
 
-    // scopeSearch
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
@@ -26,7 +23,4 @@ class Kategori extends Model
         }
         return $query;
     }
-
-    
-
 }

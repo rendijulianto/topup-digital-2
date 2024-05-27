@@ -488,24 +488,24 @@
         let url = `{{ route('cashier.topup.print', ':id') }}`;
         url = url.replace(':id', id);
         $.ajax({
-                    url: url,
-                    method: "GET",
-                    success: function(data) {
-                        // Buka popup baru
-                          var popup = window.open('', '_blank', 'width=600,height=400');    
-                        // Tulis konten yang diperoleh dari AJAX ke dalam popup
-                        popup.document.write(data); 
-                        // Tutup penulisan dokumen dan tampilkan popup
-                        popup.document.close(); 
-                        $(popup).on('load', function() {
-                            popup.print();
-                            popup.close();
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(error);
+            url: url,
+            method: "GET",
+            success: function(data) {
+                var popup = window.open('', '_blank', 'width=600,height=400');    
+                popup.document.open();
+                popup.document.write(data); 
+                popup.document.close(); 
+                popup.onload = function() {
+                    popup.print();
+                    popup.onafterprint = function() {
+                        popup.close();
                     }
-                });
+                };
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+            }
+        });
     }
 
 

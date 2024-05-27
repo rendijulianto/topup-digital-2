@@ -134,32 +134,6 @@ class TopupController extends Controller
     }
 
 
-
-    // store
-    public function store(Request $request)
-    {
-        $this->validate($request, [
-           'produk_id' => 'required|exists:produk,id',
-           'nomor' => 'required|numeric',
-        ]);
-
-        try {
-            $user = Auth::guard('pengguna')->user();
-            $pengguna = Pengguna::where('user_id', $user->id)->first();
-            $topup = $pengguna->topup()->create([
-                'produk_id' => $request->produk_id,
-                'nomor' => $request->nomor,
-                'status' => 'pending',
-            ]);
-
-            return redirect()->route('topup.show', $topup->id);
-        } catch (\Throwable $th) {
-            //throw $th;
-        } catch (\Throwable $th) {
-            //throw $th;
-        }
-    }
-
     public function cashier(Request $request)
     {
         $user = auth()->guard('pengguna')->user();	

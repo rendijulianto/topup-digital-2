@@ -8,7 +8,7 @@
     <meta content="Rendi Julianto" name="author" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="{{asset('assets/images/logo-dark.png')}}" />
+    <link rel="shortcut icon" href="{{$websiteData->logo_website_url}}" />
 
     <!-- Theme Config Js -->
     <script src="{{asset('assets/js/config.js')}}"></script>

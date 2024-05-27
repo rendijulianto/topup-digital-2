@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Kategori, Brand, Tipe, Produk, Supplier};
+use App\Models\{Brand};
 use Illuminate\Support\Str;
 class BrandController extends Controller
 {
@@ -23,24 +23,6 @@ class BrandController extends Controller
             'status' => true,
             'message' => 'Data berhasil diambil',
             'data' => $brands
-        ], 200);
-    }
-
-
-    public function voucher(Request $request)
-    {
-        $this->validate($request, [
-            'brand_id' => 'required|exists:brand,id',
-        ]);
-        
-        $brand = Brand::findOrFail($request->brand_id);
-        $vouchers = $brand->voucher_kosong()->select('id', 'harga', 'stok','tgl_kadaluarsa')
-            ->where('stok', '>', 0)
-        ->orderBy('harga', 'asc')->get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Data berhasil diambil',
-            'data' => $vouchers
         ], 200);
     }
 }

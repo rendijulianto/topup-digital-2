@@ -34,13 +34,21 @@ Route::group(['prefix' => '/admin', 'middleware' => ['role:admin'], 'as' => 'adm
     Route::get('dashboard', 'DashboardController@admin')->name('dashboard');
     Route::get('suppliers/performance', 'SupplierController@report')->name('suppliers.performance');
     Route::put('banners/{banner}/updateStatus', 'BannerController@updateStatus')->name('banners.updateStatus');
-    Route::get('products/edit-masal', 'ProductController@editMasal')->name('products.edit-masal');
-    Route::put('products/edit-masal', 'ProductController@updateMasal')->name('products.update-masal');
+    Route::get('products/edit-masal', 'ProductController@editPrice')->name('products.edit-masal');
+    Route::put('products/edit-masal', 'ProductController@updatePrice')->name('products.update-masal');
+    Route::get('products/{product}/supplier', 'ProductController@supplier')->name('products.supplier.index');
+    Route::get('products/{product}/supplier/create', 'ProductController@createSupplier')->name('products.supplier.create');
+    Route::post('products/{product}/supplier', 'ProductController@storeSupplier')->name('products.supplier.store');
+    Route::get('products/supplier/{supplierProduct}/edit', 'ProductController@editSupplier')->name('products.supplier.edit');
+    Route::put('products/supplier/{supplierProduct}', 'ProductController@updateSupplier')->name('products.supplier.update');
+    Route::delete('products/supplier/{supplierProduct}', 'ProductController@destroySupplier')->name('products.supplier.destroy');
+    Route::put('products/{product}/updateStatus', 'ProductController@updateStatus')->name('products.updateStatus');
     Route::get('logs/cek-nama', 'ActivityLogController@cekNama')->name('logs.cek-nama');
     Route::delete('logs/cek-nama/{id}', 'ActivityLogController@destroyCekNama')->name('logs.cek-nama.destroy');
     Route::get('logs/cek-voucher', 'ActivityLogController@cekVoucher')->name('logs.cek-voucher');
     Route::get('logs', 'ActivityLogController@index')->name('logs.index');
     Route::get('website', 'WebsiteController@index')->name('website');
+    Route::put('website/{website}', 'WebsiteController@update')->name('website.update');
     Route::resource('brands', 'BrandController');
     Route::resource('banners', 'BannerController');
     Route::resource('categories', 'CategoryController');
@@ -103,7 +111,7 @@ Route::group(['prefix' => '/api', 'as' => 'api.'], function () {
     Route::post('/pelanggan', 'Api\CustomerController@store')->name('customer.store');
 
     Route::group(['prefix' => '/digiflazz'], function () {
-        Route::get('profile', 'Api\CheckController@profile')->name('digiflazz.profile');
+        Route::get('balance', 'Api\CheckController@balance')->name('digiflazz.profile');
     });
     Route::group(['prefix' => '/check'], function () {
         Route::post('e-wallet', 'Api\CheckController@eWallet')->name('check.e-wallet');
@@ -119,7 +127,7 @@ Route::group(['prefix' => '/api', 'as' => 'api.'], function () {
         Route::get('/best-seller', 'Api\ProductController@getBestSeller')->name('products.best-seller');
         Route::get('/aktivasi-voucher', 'Api\ProductController@getActivationVoucher')->name('products.aktivasi-voucher');
         Route::get('/voucher-fisik', 'Api\ProductController@getVoucherFisikByBrand')->name('products.voucher-fisik');
-        Route::get('/category-brand-type', 'Api\ProductController@categoryBrandType')->name('products.category-brand-type');
+        Route::get('/category-brand-type', 'Api\ProductController@getByCategoryBrandType')->name('products.category-brand-type');
         Route::get('/{product}/supplier', 'Api\ProductController@getSupplierProduct')->name('products.supplier');
         Route::get('/{product}/selling-price', 'Api\ProductController@sellingPrice')->name('products.selling_price');
         Route::get('/{product}', 'Api\ProductController@show')->name('products.show');

@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TopupEWallet extends Model
+class CekNama extends Model
 {
     use HasFactory;
 
-    protected $table = 'topup_e_wallet';
+    protected $table = 'cek_nama';
 
     protected $fillable = [
-        'topup_id',
-        'nama_pelanggan',
+        'ref_id',
+        'brand_id',
+        'nomor',
+        'nama',
+        'status',
     ];
-    public $timestamps = false;
 }

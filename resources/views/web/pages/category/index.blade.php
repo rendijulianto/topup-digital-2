@@ -205,7 +205,7 @@
         });
     }
 
-    $('#btnSubmitUbah').on('click', function(e) {
+    const handleEditSubmit = () => {
         e.preventDefault();
         const url = $('#form_ubah form').attr('action');
         const method = $('#form_ubah form').attr('method');
@@ -248,8 +248,8 @@
                 }
             }
         });
-    });
-
+    }
+    
     const handleDelete = (id) => {
         Swal.fire({
             title: 'Apakah Anda yakin?',

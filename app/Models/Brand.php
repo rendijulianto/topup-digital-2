@@ -9,21 +9,17 @@ class Brand extends Model
 {
     use HasFactory;
 
-    // table name
     protected $table = 'brand';
 
-    // fillable attrib
     protected $fillable = [
         'nama',
         'logo',
     ];
 
-    // append
     protected $appends = [
         'logo_url',
     ];
 
-    // scopeCategory
     public function scopeCategory($query, $category)
     {
         return $query->whereHas('produk', function ($query) use ($category) {
@@ -33,7 +29,6 @@ class Brand extends Model
         });
     }
 
-    // scopeSearch
     public function scopeSearch($query, $request)
     {
         return $query->when($request->search, function ($query) use ($request) {
@@ -41,14 +36,11 @@ class Brand extends Model
         });
     }
 
-
-
     public function produk()
     {
         return $this->hasMany(Produk::class, 'brand_id', 'id');
     }
 
-    // topup
     public function topup()
     {
         return $this->hasMany(Topup::class, 'brand_id', 'id');

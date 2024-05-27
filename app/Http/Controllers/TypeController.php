@@ -63,14 +63,6 @@ class TypeController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Tipe $type)
-    {
-        return view('web.pages.type.show', compact('type'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Tipe $type)

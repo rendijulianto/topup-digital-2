@@ -1,9 +1,4 @@
 @extends('web.layout.app')
-@section('style')
-<style>
-
-</style>
-@endsection
 @section('breadcrumb')
 <div class="row">
     <div class="col-12">
@@ -62,12 +57,10 @@
                                                 class="btn btn-warning btn-sm"
                                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ubah"
                                                     ><i class="fa fa-edit"></i></a>
-                                             
                                                 <button
                                                     onclick="handleDelete({{$brand->id}})"
                                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hapus"
-                                                class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
-                                            
+                                                class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>                  
                                             </td>
                                         </tr>
                                         @empty
@@ -79,9 +72,7 @@
                                         </tbody>
                                     </table>
                                 </div> <!-- end .table-responsive -->
-        
                                 {{$brands->withQueryString()->links()}}
-        
                             </div> <!-- end .table-rep-plugin-->
                         </div> <!-- end .responsive-table-plugin-->
                     </div>
@@ -102,11 +93,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="form_tambah">
-         
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Batal</button>
-                <button type="submit" id="btnSubmitTambah" class="btn btn-success btn-sm">Simpan</button>
+                <button type="submit"
+                    onclick="handleAdd(event)"
+                class="btn btn-success btn-sm">Simpan</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -122,11 +114,12 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="form_ubah">
-         
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Batal</button>
-                <button type="submit" id="btnSubmitUbah" class="btn btn-success btn-sm">Simpan</button>
+                <button 
+                onclick="handleUpdate(event)"
+                class="btn btn-success btn-sm">Simpan</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -136,11 +129,8 @@
 <script>
     const handleSearch = () => {
         const search = document.querySelector('input[name="search"]').value;
-       
         window.location.href = `{{route('admin.brands.index')}}?search=${search}`;
     }
-
-
 
     document.querySelector('input[name="search"]').addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
@@ -155,13 +145,20 @@
         });
     });
 
-    $('#btnSubmitTambah').on('click', function(e) {
+    const handleEdit = (id) => {
+        let url = `{{route('admin.brands.edit', 'id')}}`;
+        url = url.replace('id', id);
+        $.get(`${url}`, function(data) {
+            $('#form_ubah').html(data);
+            $('#modal-ubah').modal('show');
+        });
+    }
+
+    const handleAdd = (e) => {
         e.preventDefault();
         const url = $('#form_tambah form').attr('action');
         const method = $('#form_tambah form').attr('method');
-
         const formData = new FormData($('#form_tambah form')[0]);
-
         $('#form_tambah input').removeClass('is-invalid');
         $.ajax({
             url: url,
@@ -186,9 +183,6 @@
                     Object.keys(errors).forEach((key) => {
                         $(`#form_tambah input[name="${key}"]`).addClass('is-invalid');
                         $(`#form_tambah select[name="${key}"]`).addClass('is-invalid');
-                        // berikan pesan error
-                        console.log(errors[key][0]);
-                        console.log($(`#form_tambah input[name="${key}"]`).next().html('<small class="text-danger">'+errors[key][0]+'</small>'));
                         $(`#form_tambah input[name="${key}"]`).next().html(errors[key][0]);
                         $(`#form_tambah select[name="${key}"]`).next().html(errors[key][0]);
                     });
@@ -201,24 +195,13 @@
                 }
             }
         });
-    });
-
-
-    const handleEdit = (id) => {
-        let url = `{{route('admin.brands.edit', 'id')}}`;
-        url = url.replace('id', id);
-        $.get(`${url}`, function(data) {
-            $('#form_ubah').html(data);
-            $('#modal-ubah').modal('show');
-        });
     }
 
-    $('#btnSubmitUbah').on('click', function(e) {
+    const handleUpdate = (e) => {
         e.preventDefault();
         const url = $('#form_ubah form').attr('action');
         const method = $('#form_ubah form').attr('method');
         const formData = new FormData($('#form_ubah form')[0]);
-        
         $('#form_ubah input').removeClass('is-invalid');
         $('#form_ubah select').removeClass('is-invalid');
         $.ajax({
@@ -244,9 +227,6 @@
                     Object.keys(errors).forEach((key) => {
                         $(`#form_ubah input[name="${key}"]`).addClass('is-invalid');
                         $(`#form_ubah select[name="${key}"]`).addClass('is-invalid');
-                        // berikan pesan error
-                        console.log(errors[key][0]);
-                        console.log($(`#form_ubah input[name="${key}"]`).next().html('<small class="text-danger">'+errors[key][0]+'</small>'));
                         $(`#form_ubah input[name="${key}"]`).next().html(errors[key][0]);
                         $(`#form_ubah select[name="${key}"]`).next().html(errors[key][0]);
                     });
@@ -259,7 +239,7 @@
                 }
             }
         });
-    });
+    }
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -298,6 +278,12 @@
                                 icon: 'error',
                                 title: 'Oops...',
                                 text: 'Terjadi kesalahan pada server!'
+                            });
+                        } else if (xhr.status === 401) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: xhr.responseJSON.message
                             });
                         }
                     }

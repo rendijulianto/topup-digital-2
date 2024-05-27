@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Cron;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\{Kategori, Brand, Tipe, Produk, Supplier, SupplierProduk};
 use Illuminate\Support\Str;
 use App\Services\DigiflazzService;
@@ -39,7 +38,7 @@ class ProductController extends Controller
        
     }
 
-   private function harga_e_wallet($harga, $layanan) 
+    private function harga_e_wallet($harga, $layanan) 
     {
         try {
             $pecah = explode(' ', $layanan);
@@ -113,9 +112,7 @@ class ProductController extends Controller
     public function update()
     {
         try {
-            $digiflazz = new DigiflazzService;
-
-            $priceList = $digiflazz->getProducts();
+            $priceList = DigiflazzService::getProducts();
             if (!$priceList['status']) {
                 echo '['.date('Y-m-d H:i:s').'] Sinkronisasi data produk gagal'."<br>";
                 return;
@@ -123,8 +120,7 @@ class ProductController extends Controller
             echo '['.date('Y-m-d H:i:s').'] Sinkronisasi data produk berhasil dimulai'."<br>";
 
             foreach ($priceList['data'] as $product) {
-                 // Aktivasi Voucher,E-Money,Data,Masa Aktif,Paket SMS & Telpon,PLN,Pulsa
-                 if (!Str::contains($product->category, ['Aktivasi Voucher','E-Money','Data','Masa Aktif','Paket SMS & Telpon','PLN','Pulsa'])) {
+                 if (!Str::contains($product->category, ['Aktivasi Voucher','E-Money','Data','Masa Aktif','PLN','Pulsa'])) {
                     continue;
                 }
                 if (Str::contains($product->product_name, 'Cek Nama') || Str::contains($product->product_name, 'Cek Status')) {
@@ -132,14 +128,9 @@ class ProductController extends Controller
                 }
 
                 $category = Kategori::firstOrCreate(['nama' => $product->category]);
-
                 $brand = Brand::firstOrCreate(['nama' => $product->brand]);
-
                 $type = Tipe::firstOrCreate(['nama' => $product->type]);
-
                 $supplier = Supplier::firstOrCreate(['nama' => $product->seller_name]);
-
-  
                 $productData = Produk::firstOrCreate(
                     [
                         'nama' => $product->product_name,
@@ -151,32 +142,10 @@ class ProductController extends Controller
                 );
 
                 $status = $product->buyer_product_status == 1 ? $product->seller_product_status ? 1 : 0 : 0;
-            
                 $stock = $product->unlimited_stock == 1 ? 999999 : $product->stock;
-
-                // $productSupplier = $productData->supplier_produk()->updateOrCreate(
-                //     [
-                //         'produk_sku_code' => $product->buyer_sku_code,
-                //     ],
-                //     [
-
-                //         'produk_sku_code' => $product->buyer_sku_code,
-                //         'supplier_id' => $supplier->id,
-                //         'harga' => $product->price,
-                //         'stok' => $stock,
-                //         'status' => $status,
-                //         'multi' => $product->multi,
-                //         'jam_buka' => $product->start_cut_off ? $product->start_cut_off : '00:00:00',
-                //         'jam_tutup' => $product->end_cut_off ? $product->end_cut_off : '00:00:00',
-                //     ]
-                // );
-
-                // cek apakah buyer_sku_code sudah ada di supplier_produk
                 $productSupplier = SupplierProduk::where('produk_sku_code', $product->buyer_sku_code)->first();
-
-                // jika belum ada
                 if (!$productSupplier) {
-                    $productSupplier = new SupplierProduk;
+                    $productSupplier = new SupplierProduk();
                     $productSupplier->produk_sku_code = $product->buyer_sku_code;
                 }
                 $productSupplier->produk_id = $productData->id;
@@ -189,12 +158,9 @@ class ProductController extends Controller
                 $productSupplier->jam_tutup = $product->end_cut_off ? $product->end_cut_off : '00:00:00';
                 $productSupplier->save();
 
-                
-
-                // minimal keuntungan 1500
                 $profit =  $productData->harga - $productSupplier->harga;
 
-                if ($profit < 50000) {
+                if ($profit < 2000) {
                     switch (Str::lower($category->nama)) {
                         case 'e-money':
                             $selling_price = ceil(($this->harga_e_wallet($product->price, $product->product_name)) / 500) * 500;
@@ -215,36 +181,15 @@ class ProductController extends Controller
                     $productData->update([
                         'harga' => $selling_price,
                     ]);
+
                 }
-
-              
-
             }
             echo '['.date('Y-m-d H:i:s').'] Sinkronisasi data produk berhasil selesai'."<br>";
-        } catch (\Gonon\Digiflazz\Exceptions\ApiException $e) {
-            echo 'api: '.$e->getMessage();
-        } catch (\Gonon\Digiflazz\Exceptions\InvalidArgumentException $e) {
-            echo 'invalid:m '.$e->getMessage();
         } catch (\Throwable $th) {
             echo config('app.debug') ? 'Line '.$th->getLine().' in '.$th->getFile().': <b>'.$th->getMessage().'</b>'
 
             : 'Terjadi kesalahan sistem';
         }    
 
-    }
-
-    public function updateStatus()
-    {
-        // cek product yang tidak ada di digiflazz melalui update_at
-        $products = SupplierProduk::all();
-        foreach ($products as $product) {
-            // jika update_atnya lebih dari 1 hari
-            if ($product->updated_at->diffInDays(now()) > 0) {
-                $product->update([
-                    'status' => 0,
-                ]);
-            }
-        }
-        echo  '['.date('Y-m-d H:i:s').'] Sinkronisasi data produk status berhasil selesai'."<br>";
     }
 }

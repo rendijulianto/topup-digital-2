@@ -223,54 +223,6 @@
         </div>
     </div>
 </div>
-<div class="modal fade" id="modalCustom" tabindex="-1" aria-labelledby="modalCustomLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="modalCustomLabel"><i class="fa fa-plus-circle"></i>Detail Topup </h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-6 mb-3">
-                        <label for="name" class="form-label">Nomor</label>
-                        <input type="text" class="form-control form-control-lg" name="show_custom_number" id="show_custom_number" disabled>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label for="name" class="form-label">Nama Pelanggan</label>
-                        <input type="text" class="form-control form-control-lg" name="show_custom_name" id="show_custom_name" disabled>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label for="name" class="form-label">Nama Produk</label>
-                        <input type="text" class="form-control form-control-lg" name="show_custom_product_name" id="show_custom_product_name" disabled>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <label for="name" class="form-label">Nominal Topup <i class="fa fa-question-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Masukan nominal topup yang diinginkan maksimal 1.000.000"></i></label>
-                        <input type="text" class="form-control form-control-lg keyboard-virtual" name="amount" id="amount"  placeholder="Masukan nominal topup">
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label for="selling_price" class="form-label">Bayar</label>
-                        <input type="text" class="form-control form-control-lg" name="show_custom_product_selling_price" id="show_custom_product_selling_price" value="Rp 0" disabled>
-                    </div>
-                    <div class="col-12">
-                        <label for="whatsapp" class="form-label">Whatsapp
-                            <i class="fa fa-question-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Masukan nomor whatsapp untuk mengirimkan bukti transaksi"></i>
-                        </label>
-                        <input type="text" class="form-control form-control-lg keyboard-virtual" name="whatsapp" id="whatsapp" placeholder="08xxxxxxxxxx">
-                        <small class="text-muted">*Masukan nomor whatsapp untuk mengirimkan bukti transaksi</small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light btn-lg" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-success btn-lg" id="btnCreateTopupCustom">
-                    <i class="fa fa-check"></i>
-                    Konfirmasi Topup
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 @section('script')
 @include('web.pages.topup.script')
@@ -280,50 +232,9 @@
     });
 
     
-
-    $('#amount').on('keyup', debounce(function () {
-        let amount = $(this).val();
-        amount = amount.replace(/\./g, '');
-        let product_id = $('.card-product-custom.active').data('id');
-        let url = `{{route('api.products.selling_price', ['product' => ':product'])}}`;
-        url = url.replace(':product', product_id);
-        $.ajax({
-            url: url,
-            type: "GET",
-            data: {
-                amount: amount
-            },
-            beforeSend: function(){
-                $('#show_custom_product_selling_price').val('Rp 0');
-            },
-            success: function(response){
-                if(response.status == true){
-                    $('#show_custom_product_selling_price').val(formatAngka(response.data.harga_bulat, 'rupiah'));
-                }else{
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: response.message,
-                    })
-                }
-            },
-            error: function(response){
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Terjadi kesalahan pada server',
-                })
-            },
-            complete: function(){
-                // button disabled
-
-            }
-        })
-    }, 1000));
     // keypress
     $('#number').keypress(function(e){
         $('.card-product').addClass('disabled opacity-50');
-        $('.card-product-custom').addClass('disabled opacity-50');
         if(e.which == 13 || e.keyCode == 13 || e.key == 'Enter' && $('#btnCheck').attr('disabled') == false){
             $('#btnCheck').click();
         }
@@ -392,32 +303,13 @@
                             $('#product_id').val($(this).data('id'));
                             $('#show_number').val($('#number').val());
                             $('#show_product_name').val($(this).data('name'));
-                            $('#show_product_selling_price').val(formatAngka($(this).data('selling_price'), 'rupiah'));
+                            $('#show_product_selling_price').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
+                                minimumFractionDigits: 0
+                            }).format($(this).data('selling_price')));
                             $('#show_product_description').val($(this).data('description'));
                             $('#modalDetail').modal('show');
                         });
-                        
-                        $('.card-product-custom').on('click', function(){
-                            if ($(this).hasClass('disabled')) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Oops...',
-                                    text: 'Silahkan isi nomor telepon terlebih dahulu!',
-                                })
-
-                                return false;
-                            }
-                            $('.card-product-custom').removeClass('active');
-                            $(this).addClass('active');
-                            $('#product_custom_id').val($(this).data('id'));
-                            $('#show_custom_number').val($('#number').val());
-                            $('#show_custom_product_name').val($(this).data('name'));
-                            $('#show_product_selling_price').val(formatAngka($(this).data('selling_price'), 'rupiah'));
-                            // fokus
-                            
-                            $('#modalCustom').modal('show');
-                            $('[name="amount"]').attr('autofocus', true);
-                        });
+                    
                     }else{
                         Swal.fire({
                             icon: 'error',
@@ -632,106 +524,6 @@
         });
 
 
-        $('#btnCreateTopupCustom').click(function(){
-            
-
-            let product_id = $('.card-product-custom.active').data('id');
-            let number = $('#number').val();
-            let whatsapp = $('#whatsapp').val();
-            let nama_pelanggan = $('#show_name').val();
-            let amount = $('#amount').val();
-            amount = amount.replace(/\./g, '');
-            $.ajax({
-                url: "{{route('api.topups.store')}}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    produk_id: product_id,
-                    nomor: number,
-                    whatsapp: whatsapp,
-                    nama_pelanggan: nama_pelanggan,
-                    nominal: amount
-                },
-                beforeSend: function(){
-                    // progress loading
-                    $('#btnCreateTopupCustom').attr('disabled', true);
-                    $('#btnCreateTopupCustom').html(`
-                      <span class="spinner-btopup spinner-btopup-sm" role="status" aria-hidden="true"></span>
-                        Memuat...
-                    `);
-                },
-                success: function(response){
-                    if(response.status == true){
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil',
-                            text: response.message,
-                            showDenyButton: false,
-                            showCancelButton: false,
-                            confirmButtonText: `OK`,
-                            // timer: 2000,
-                        }).then((result) => {
-                            @if(request()->isGuest == "true")
-                                id = response.data.id;
-                                url = "{{route('topup.detail', ['id' => ':id'])}}?isGuest=true";
-                                url = url.replace(':id', id);
-                                window.location.href = url;
-                                @else
-                                window.location.href = "{{route('cashier.topup')}}";
-                            @endif
-                        })
-                        $('#modalCustom').modal('hide');
-                        $('#whatsapp').val('');
-                    }else{
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: response.message,
-                        })
-                    }
-                },
-                error: function(response){
-                //    422
-                    if(response.status == 422){
-                        let error = response.responseJSON.errors;
-                        let message = '';
-                        $.each(error, function(key, value){
-                            message += value + '<br>';
-                        });
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            html: message,
-                        })
-                        // 404
-                    }else if(response.status == 404){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: response.responseJSON.message,
-                        })
-                    }else{
-                        // swal konfirmasi server error
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            message: 'Terjadi kesalahan pada server',
-                            button: 'OK'
-                        })
-                    }
-                },
-                complete: function(){
-                    // button disabled
-                    $('#btnCreateTopupCustom').attr('disabled', false);
-                    $('#btnCreateTopupCustom').html(`
-                        <i class="fa fa-shopping-cart"></i>
-                        Pesan Sekarang
-                    `);
-                }
-            })
-
-});
-    
 
 
 
@@ -739,9 +531,6 @@
         getProducts();
 
         $('input').attr('autocomplete', 'off');
-        // setTimeout(function(){
-        //     window.location.href = "{{route('dashboard')}}";
-        // }, 600000);
 
     });
 

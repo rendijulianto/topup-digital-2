@@ -1,7 +1,6 @@
 <?php
 namespace App\Services;
 
-use Rendijulianto\Piwapi\Main as Piwapi;
 
 /**
  * Class PiwapiService.
@@ -16,13 +15,36 @@ class PiwapiService
             if (substr($no, 0, 1) == '0') {
                 $no = '62'.substr($no, 1);
             }
-            // dd(config('app.piwapi.api_key'), config('app.piwapi.device_id'));
-            $piwapi = new Piwapi('https://piwapi.com/api/send/whatsapp', config('app.piwapi.api_key'), config('app.piwapi.device_id'));
-            $send = $piwapi->sendMessage($no, $message);
-            return [
-                'status' => true,
-                'data' => $send,
+
+            $postData = [
+                "secret" => config('app.piwapi.api_key'), 
+                "account" => config('app.piwapi.device_id'),
+                "recipient" => $no,
+                "type" => "text",
+                "priority" => 1,
+                "message" => $message,
             ];
+        
+            $cURL = curl_init('https://piwapi.com/api/send/whatsapp');
+            curl_setopt($cURL, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($cURL, CURLOPT_POSTFIELDS, $postData);
+            $response = curl_exec($cURL);
+            curl_close($cURL);
+
+            $result = json_decode($response, true);
+
+            if ($result['status'] != 200) {
+                return [
+                    'status' => false,
+                    'message' => $result['message'],
+                ];
+            } else {
+                return [
+                    'status' => true,
+                    'message' => $result['message'],
+                ];
+            }
+           
         } catch (\Throwable $th) {
             return [
                 'status' => false,

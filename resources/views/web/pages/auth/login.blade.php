@@ -5,14 +5,14 @@
 <head>
     <meta charset="utf-8" />
     <title>
-        {{ config('app.name') }} - Masuk
+    {{ $websiteData->nama }} - Masuk
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Aplikasi Top up Digital" name="description" />
     <meta content="Rendi Julianto" name="author" />
 
     <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{$websiteData->logo_website_url}}" />
 
     <!-- Theme Config Js -->
     <script src="{{asset('assets/js/config.js')}}"></script>
@@ -41,7 +41,7 @@
                                     <div class="p-4 my-auto">
        
                                         <div class="d-flex align-items-center mb-4">
-                                            <img src="assets/images/logo-dark.png" alt="dark logo" height="75">
+                                            <img src="{{$websiteData->logo_website_url}}" alt="dark logo" height="75">
                                             <div>
                                                 <h4 class="ml-5 mb-0 mt-2" style="margin-left: 10px;">
                                                     Masuk

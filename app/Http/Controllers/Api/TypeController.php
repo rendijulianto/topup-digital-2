@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Kategori, Brand, Tipe, Produk, Supplier,Prefix};
+use App\Models\{Tipe, Prefix};
 use Illuminate\Support\Str;
 class TypeController extends Controller
 {
@@ -50,13 +50,13 @@ class TypeController extends Controller
     public function getByCategoryBrand(Request $request)
     {
         $this->validate($request, [
-            'kategori' => 'required|exists:kategori,nama',
-            'brand' => 'required|exists:brand,nama'
+            'kategori_id' => 'required|exists:kategori,id',
+            'brand_id' => 'required|exists:brand,id'
         ]);
 
         $types = Tipe::select('id', 'nama')
-        ->brand($request->brand)
-        ->category($request->kategori)->get();
+        ->brand($request->brand_id)
+        ->category($request->kategori_id)->get();
 
         return response()->json([
             'status' => true,

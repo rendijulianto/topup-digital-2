@@ -34,20 +34,20 @@
             <td align='CENTER' vertical-align:top'><span style='color:black;'>
               
                      <div style='display: flex; justify-content: center; align-items: center;'>
-                        <img src="{{asset('assets/images/print_toko_indah.png')}}" width="30px" />
+                        <img src="{{$websiteData->logo_website_url}}" width="30px" />
                      <b
                      style="font-size:16pt; margin-left: 10px; color:black;"
                      >
-                        {{config('app.name')}}
+                        {{$websiteData->nama}}
                   </b>
             
                      </div>
                      <span style='font-size:12pt'>
-                     {{config('app.address')}}
+                     {{$websiteData->alamat}}
                   </span></br>
                      <span style='font-size:12pt'>
                      Telepon : 
-                     {{config('app.phone')}}
+                     {{$websiteData->nomor_telepon}}
                      <br />
 
                      {{$topup->created_at->format('d M Y H:i:s')}}

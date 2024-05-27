@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
-use App\Models\{Topup, Pengguna, Produk,SupplierProduk,TopupApi,LogAktivitas};
+use App\Models\{Topup,  Produk,TopupApi,LogAktivitas};
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\{CekNama, Brand, Kategori};
-use Gonon\Digiflazz\{Digiflazz,Transaction};
-use App\Services\{DigiflazzService, PiwapiService,ProductService, SocketService};
-use Carbon\Carbon;
-// Hash
+use App\Services\{DigiflazzService, PiwapiService, SocketService};
+
 use Illuminate\Support\Facades\Hash;
 set_time_limit(3600);
 class TopupController extends Controller
@@ -179,9 +176,9 @@ class TopupController extends Controller
                 'ref_id' => $ref_id,
             ];
             
-            $digiflazzService = new DigiflazzService();
+            
     
-            $response = $digiflazzService->createTransaction($params);
+            $response = DigiflazzService::createTransaction($params);
         
 
             if(!$response['status']) {
@@ -297,8 +294,8 @@ class TopupController extends Controller
                 'ref_id' => $ref_id,
             ];
             
-            $digiflazzService = new DigiflazzService();             
-            $response = $digiflazzService->createTransaction($params);
+                         
+            $response = DigiflazzService::createTransaction($params);
             $harga_beli =  $response['data']['price']?? $product->harga;
 
 
@@ -417,43 +414,21 @@ class TopupController extends Controller
     }
 
 
-    public function print(Topup $topup)
-    {
-        return view('print', compact('topup'));
-    }
-
     //cekStatus -> ref_id anu dicek
     public function checkStatus(Request $request, Topup $topup)
     {
         DB::beginTransaction();
         try {
-            $digiflazzService = new DigiflazzService();
-
             $params = [
                 'ref_id' => $topup->topup_api->last()->ref_id,
                 'buyer_sku_code' => $topup->topup_api->last()->supplier_produk->produk_sku_code,
                 'customer_no' => $topup->nomor,
             ];
-
-            if($topup->tipe == 'e_wallet_custom') {
-                $response = $digiflazzService->createTransactionPostpaid($params);
-            } else {
-                $response = $digiflazzService->createTransaction($params);
-            }
-    
+            $response = DigiflazzService::createTransaction($params);
          
             if(!$response['status']) {
                 throw new \Exception($response['message'], 422);
             }
-            $status = $topup->status;
-
-            // price
-            if($topup->tipe_produk->slug == 'custom' && $response['data']['status'] == "Sukses") {
-                $topup->update([
-                    'harga_beli' => $response['data']['price']
-                ]);
-            }
-
             $topup->update([
                 'status' => $response['data']['status'],
                 'keterangan' => $response['data']['sn'] ?? '-',
@@ -465,7 +440,7 @@ class TopupController extends Controller
                 'response' => $topup->topup_api->last()->response . "\n" . json_encode($response['data']),
             ]);
             DB::commit();
-            if(strtolower($response['data']['status']) != strtolower($status)) {
+            if(strtolower($response['data']['status']) != strtolower($topup->status)) {
                 PiwapiService::sendMessage($topup->whatsapp, $topup->whatsapp_message);
             }
             return response()->json([
@@ -669,8 +644,6 @@ class TopupController extends Controller
             $data = json_decode($request->getContent(), true);
             $trx_id = $data['data']['trx_id'];
             $ref_id = $data['data']['ref_id'];
-            $customer_no = $data['data']['customer_no'];
-            $buyer_sku_code = $data['data']['buyer_sku_code'];
             $message = $data['data']['message'];
             $status = $data['data']['status'];
             $rc = $data['data']['rc'];
@@ -702,7 +675,6 @@ class TopupController extends Controller
                 if($topup->topup->tipe != 'voucher') {
                     PiwapiService::sendMessage($topup->topup->whatsapp, $topup->topup->whatsapp_message);
                 }
-              
                 SocketService::sendTrigger($topup->topup);
                 echo 'Data berhasil ditemukan';
             } else {

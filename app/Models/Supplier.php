@@ -17,15 +17,7 @@ class Supplier extends Model
         'nama'
     ];
 
-    // performance append
 
-    // has many topup
-    public function topup()
-    {
-        return $this->hasMany(TopupApi::class, 'supplier_id');
-    }
-
-    // search scope
     public function scopeSearch($query, $request)
     {
         if ($request->q) {
@@ -33,17 +25,16 @@ class Supplier extends Model
         }
         return $query;
     }
-
-    // performance scope
+    
     public function scopePerformance($query, $request)
     {
         $query->withCount([
-            'topup as total_transaksi' => function ($query) use ($request) {
+            'topup_api as total_transaksi' => function ($query) use ($request) {
                 if ($request->start && $request->end) {
                     $query->whereBetween('created_at', [$request->start.' 00:00:00', $request->end.' 23:59:59']);
                 }
             },
-            'topup as total_transaksi_berhasil' => function ($query) use ($request) {
+            'topup_api as total_transaksi_berhasil' => function ($query) use ($request) {
                 if ($request->start && $request->end) {
                     $query->whereBetween('created_at', [$request->start.' 00:00:00', $request->end.' 23:59:59']);
                 }
@@ -53,4 +44,8 @@ class Supplier extends Model
         return $query;
     }
 
+    public function topup_api()
+    {
+        return $this->hasMany(TopupApi::class, 'supplier_id');
+    }
 }

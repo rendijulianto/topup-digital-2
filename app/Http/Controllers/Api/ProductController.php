@@ -8,7 +8,6 @@ use App\Models\{Produk, Brand, Tipe, Kategori, Topup};
 use Illuminate\Support\Str;
 class ProductController extends Controller
 {
-
     public function getBestSeller(Request $request)
     {
         $this->validate($request, [
@@ -19,11 +18,10 @@ class ProductController extends Controller
         bestSeller($request)
         ->get();
 
-        // replace nama Aktivasi
         $products = $products->map(function ($product) {
             $product->nama = Str::replaceFirst('Aktivasi ', '', $product->nama);
             return $product;
-        });
+        }); 
 
         return response()->json([
             'status' => true,
@@ -55,8 +53,6 @@ class ProductController extends Controller
             'brand' => 'required|exists:brand,nama',
         ]);
 
-    
-
         $products = Produk::select('id', 'nama', 'harga', 'deskripsi', 'tipe_id', 'brand_id')
         ->category('e-money')
         ->brand($request->brand)
@@ -80,7 +76,8 @@ class ProductController extends Controller
             'kategori' => 'required|exists:kategori,nama',
         ]);
 
-        $products = Produk::select('id', 'nama', 'harga', 'deskripsi')
+        $products = Produk::
+        select('id', 'nama', 'harga', 'deskripsi')
         ->category($request->kategori)
         ->type($request->tipe_id)
         ->brand($request->brand_id)
@@ -102,8 +99,6 @@ class ProductController extends Controller
             'brand_id' => 'required|exists:brand,id',
             'tipe_id' => 'required|exists:tipe,id',
         ]);
-
-    
 
         $products = Produk::select('id', 'nama', 'harga', 'deskripsi')
         ->category('Aktivasi Voucher')
@@ -127,8 +122,7 @@ class ProductController extends Controller
         $this->validate($request, [
             'brand' => 'required|exists:brand,nama',
         ]);
-        // $products = Produk::select('id', 'nama', 'harga', 'deskripsi')
-        // ->category('aktivasi voucher')
+        
         $products = Topup::getProductVoucher($request)->get()->unique('produk_id')
         ->map(function ($item) {
             return [
@@ -147,30 +141,8 @@ class ProductController extends Controller
         ], 200);
     }
 
-    public function show(Produk $product)
-    {
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Data berhasil diambil',
-            'data' =>  [
-                'product' => $product,
-                'supplier' => $product->supplier_produk->map(function ($item, $key) {
-                    return [
-                        'nama' => $item->supplier->nama,
-                        'harga' => $item->harga,
-                        'stok' => $item->stok,
-                        'multi' => $item->multi,
-                        'status' => $item->status,
-                    ];
-                })
-            ]
-        ], 200);
-    }
-
     public function getSupplierProduct(Produk $product)
     {
-        
         return response()->json([
             'status' => true,
             'message' => 'Detail topup',
@@ -178,31 +150,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function sellingPrice(Request $request, Produk $product)
-    {
-        $this->validate($request, [
-            'amount' => 'required|integer',
-        ]);
-
-       
-        $kategori = $product->kategori;
-
-        $amount = $request->amount;
-        $profit = $product->getProfit($amount);
-
-        $newHarga = $amount + $profit;
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Harga berhasil diambil',
-            'data' => [
-                'harga_real' => $newHarga,
-                'harga_bulat' => ceil($newHarga / 500) * 500,
-            ]
-        ], 200);
-    }
-
-    public function categoryBrandType(Request $request)
+    public function getByCategoryBrandType(Request $request)
     {
       
         $this->validate($request, [
@@ -229,5 +177,26 @@ class ProductController extends Controller
             'data' => $products
         ], 200);
     }
+    
+    public function show(Produk $product)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Data berhasil diambil',
+            'data' =>  [
+                'product' => $product,
+                'supplier' => $product->supplier_produk->map(function ($item, $key) {
+                    return [
+                        'nama' => $item->supplier->nama,
+                        'harga' => $item->harga,
+                        'stok' => $item->stok,
+                        'multi' => $item->multi,
+                        'status' => $item->status,
+                    ];
+                })
+            ]
+        ], 200);
+    }
+
 }
 

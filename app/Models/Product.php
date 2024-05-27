@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Produk extends Model
 {
     use HasFactory;
-
-    // table name
     protected $table = 'produk';
 
-    // fillable attrib
     protected $fillable = [
         'nama',
         'kategori_id',
@@ -22,56 +19,10 @@ class Produk extends Model
         'deskripsi',
     ];
 
-    // appends attrib
     protected $appends = [
         'status'
     ];
 
-    // relationship
-    public function kategori()
-    {
-        return $this->belongsTo(Kategori::class);
-    }
-
-    public function tipe()
-    {
-        return $this->belongsTo(Tipe::class);
-    }
-
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
-
-
-    // supplier_produk
-    public function supplier_produk()
-    {
-        return $this->hasMany(SupplierProduk::class, 'produk_id');
-    }
-
-    // topup
-    public function topup()
-    {
-        return $this->hasMany(Topup::class, 'produk_id');
-    }
-
-    public function getStatusAttribute()
-    {
-        $status = true;
-        if ($this->supplier_produk->where('status', 1)->count() == 0) {
-            $status = false;
-        }
-        unset($this->supplier_produk);
-        return $status;
-    }
-
-    public function getHargaTermahalAttribute()
-    {
-        return $this->supplier_produk->max('harga');
-    }
-   
-    // disruption scope
     public function scopeDisruption($query)
     {
         return $query->whereDoesntHave('supplier_produk', function ($query) {
@@ -79,8 +30,6 @@ class Produk extends Model
         });        
     }
 
-
-    // scope kategori
     public function scopeCategory($query, $category)
     {
         if ($category == 'all' || $category == null) {
@@ -92,7 +41,6 @@ class Produk extends Model
         });
     }
 
-    // scope brand
     public function scopeBrand($query, $brand)
     {
         if ($brand == 'all' || $brand == null) {
@@ -103,7 +51,6 @@ class Produk extends Model
         });
     }
 
-    // scope tipe
     public function scopeType($query, $type)
     {
         if ($type == 'all' || $type == null) {
@@ -115,7 +62,6 @@ class Produk extends Model
         });
     }
 
-    // scope search
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
@@ -144,14 +90,12 @@ class Produk extends Model
             $query->where('tipe_id', $request->tipe);
         }
 
-        // supplier
         if ($request->supplier && $request->supplier != 'Semua') {
             $query->whereHas('supplier_produk', function ($query) use ($request) {
                 $query->where('supplier_id', $request->supplier);
             });
         }
 
-        // status
         if ($request->status && $request->status != 'Semua' || $request->status == '0') {
             if ($request->status == '0') {
                 $query->whereDoesntHave('supplier_produk', function ($query) {
@@ -159,11 +103,8 @@ class Produk extends Model
                 });
             }
         }
-        
-
         return $query;
     }
-
 
     public function scopeBestSeller($query, $request)
     {
@@ -183,6 +124,51 @@ class Produk extends Model
 
         return $query;
     }
+
+
+    // relationship
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class);
+    }
+
+    public function tipe()
+    {
+        return $this->belongsTo(Tipe::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+
+    public function supplier_produk()
+    {
+        return $this->hasMany(SupplierProduk::class, 'produk_id');
+    }
+
+    public function topup()
+    {
+        return $this->hasMany(Topup::class, 'produk_id');
+    }
+
+    public function getStatusAttribute()
+    {
+        $status = true;
+        if ($this->supplier_produk->where('status', 1)->count() == 0) {
+            $status = false;
+        }
+        unset($this->supplier_produk);
+        return $status;
+    }
+
+    public function getHargaTermahalAttribute()
+    {
+        return $this->supplier_produk->max('harga');
+    }
+   
+    
     public function getSupplier()
     {
         $suppliers = $this->supplier_produk->filter(function ($supplier) {
@@ -204,5 +190,4 @@ class Produk extends Model
         
         return $supplierArray->values()->toArray();
     }
-    
 }

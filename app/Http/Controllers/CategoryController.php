@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\{Kategori,LogAktivitas};
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-
 class CategoryController extends Controller
 {
     /**

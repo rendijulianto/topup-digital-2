@@ -9,19 +9,18 @@ class Tipe extends Model
 {
     use HasFactory;
 
-    // table name
     protected $table = 'tipe';
 
-    // fillable attrib
     protected $fillable = [
         'nama'
     ];
 
-
-    // produk
-    public function produk()
+    public function scopeSearch($query, $request)
     {
-        return $this->hasMany(Produk::class, 'tipe_id', 'id');
+        if ($request->search) {
+            $query = $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+        return $query;
     }
 
     public function scopeBrand($query, $brand)
@@ -46,11 +45,8 @@ class Tipe extends Model
         }
     }
 
-    public function scopeSearch($query, $request)
+    public function produk()
     {
-        if ($request->search) {
-            $query = $query->where('nama', 'like', '%' . $request->search . '%');
-        }
-        return $query;
+        return $this->hasMany(Produk::class, 'tipe_id', 'id');
     }
 }

@@ -82,7 +82,7 @@
                             </td>
                         </tr>
                     </table>
-                    <button class="btn btn-danger btn-sm float-end" id="btn-beli" disabled>
+                    <button class="btn btn-danger btn-sm float-end" disabled onclick="handleSell()" id="btn-beli">
                         <i class="fa fa-shopping-cart"></i>
                         Beli Sekarang
                     </button>
@@ -96,16 +96,13 @@
 @endsection
 @section('script')
 <script>
-
-    function cariVoucher() {
+    const handleSearch = () => {
         let no_seri = $('input[name=no_seri]').val();
         let url = "{{route('api.topups.sellVoucher',':no_seri')}}";
         url = url.replace(':no_seri', no_seri);
-
         $.ajax({
             url: url,
             type: "GET",
-           
             success: function(response) {
                 if (response.status == true) {   
                     $('#id_voucher').val(response.data.id);
@@ -114,13 +111,11 @@
                     $('#status_voucher').html(`
                     <span class="badge bg-${response.data.status == 'Sudah Terjual' ? 'danger' : 'success'}">${response.data.status}</span>
                     `);
-
                     $('#tanggal_terjual').html(response.data.tanggal_terjual);
                     $('#tanggal_dibuat').html(response.data.tanggal_dibuat);
                     $('#tanggal_kadaluarsa').html(response.data.tanggal_kadaluarsa);
                     if (response.data.status == 'Sudah Terjual') {
                         $('#btn-beli').prop('disabled', true);
-
                     } else {
                         $('#btn-beli').prop('disabled', false);
             
@@ -128,11 +123,9 @@
                 } else {
                     $('#detail-voucher').html('<tr><td>' + response.message + '</td></tr>');
                     $('#btn-beli').prop('disabled', true);
-                   
                 }
             },
             error: function(response) {
-                // cek apkah error 404
                 if (response.status == 404) {
                    Swal.fire({
                         title: 'Voucher tidak ditemukan',
@@ -148,10 +141,13 @@
     $(document).ready(function() {
         $('form').submit(function(e) {
             e.preventDefault();
-            cariVoucher();
+            handleSearch();
         });
 
-        $('#btn-beli').click(function() {
+        $('input').attr('autocomplete', 'off');
+        $('input').focus();
+
+        const handleSell = () => {
             Swal.fire({
                 title: 'Beli Voucher',
                 text: 'Apakah anda yakin ingin membeli voucher ini?',
@@ -191,7 +187,6 @@
                             }
                         },
                         error: function(response) {
-                            // cek status code
                             if (response.status == 422) {
                                 let errors = response.responseJSON.errors;
                                 let message = '';
@@ -217,14 +212,7 @@
                     });
                 }
             });
-        });
-
-      
-    });
-
-    $(document).ready(function() {
-        $('input').attr('autocomplete', 'off');
-        $('input').focus();
+        }      
     });
 </script>
 @endsection

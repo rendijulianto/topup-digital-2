@@ -4,13 +4,6 @@
 <div class="row">
     <div class="col-12">
         <div class="page-title-box">
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">{{config('app.name')}}</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Halaman</a></li>
-                    <li class="breadcrumb-item active">Topup {{Str::title(str_replace('-', ' ', $category))}}</li>
-                </ol>
-            </div>
             <h4 class="page-title">
                 Halaman Topup {{Str::title(str_replace('-', ' ', $category))}}
             </h4>
@@ -37,13 +30,8 @@
                             autofocus
                             id="number" name="number">
                             <button class="btn border" type="button">
-                                <img src="{{asset('assets/images/logo-dark.png')}}" id="logo" style="min-width: 20px; max-width: 100px; min-height: 20px; max-height: 20px;" alt="Image">
+                                <img src="{{$websiteData->logo_website_url}}" id="logo" style="min-width: 20px; max-width: 100px; min-height: 20px; max-height: 20px;" alt="Image">
                             </button>
-                            @if(Auth::guard('pengguna')->check() && !request()->has('isGuest'))
-                                <button class="btn btn-success" type="button" id="btnPelanggan">
-                                    <i class="fa fa-address-book"></i> Pilih Pelanggan
-                                </button>
-                            @endif
                         </div>
                         
                     </div>     
@@ -247,7 +235,10 @@
                                     <div class="card-body card-product ${product.status == false ? 'bg-danger text-white gangguan' : ''}"
                                         data-id="${product.id}"
                                         data-name="${product.nama}"
-                                        data-harga_jual="${product.harga}"
+                                        data-harga_jual="${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
+                                            minimumFractionDigits: 0
+                                        
+                                        }).format(product.harga)}"
                                         data-deskripsi="${product.deskripsi}"
                                         data-status="${product.status}">
                                     
@@ -277,7 +268,7 @@
                             $('#product_id').val($(this).data('id'));
                             $('#show_number').val($('#number').val());
                             $('#show_produk').val($(this).data('name'));
-                            $('#show_price').val(formatAngka($(this).data('harga_jual'), 'rupiah'));
+                            $('#show_price').val($(this).data('harga_jual'));
                             $('#show_description').val($(this).data('deskripsi'));
                             $('#modalDetail').modal('show');
                             $('#whatsapp').val($('#number').val());

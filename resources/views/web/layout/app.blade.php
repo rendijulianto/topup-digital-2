@@ -133,9 +133,6 @@ $('.keyboard-virtual').on('click', function () {
     });
 });
             }
-
-            // misalkan tidak ada aktivitas dalam 2 menit, arahkan ke halaman 
-            // cashier.dashboard
             
         });
         var idleTime = 0;

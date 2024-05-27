@@ -1,4 +1,5 @@
-      <!-- ========== Topbar Start ========== -->
+
+<!-- ========== Topbar Start ========== -->
       <div class="navbar-custom">
         <div class="topbar container-fluid">
             <div class="d-flex align-items-center gap-1">
@@ -8,20 +9,20 @@
                     <!-- Logo light -->
                     <a href="/" class="logo-light">
                         <span class="logo-lg">
-                            <img src="{{asset('assets/images/logo-dark.png')}}" alt="logo">
+                            <img src="{{$websiteData->logo_website_url}}" alt="logo">
                         </span>
                         <span class="logo-sm">
-                            <img src="{{asset('assets/images/logo-dark.png')}}" alt="small logo">
+                            <img src="{{$websiteData->logo_website_url}}" alt="small logo">
                         </span>
                     </a>
 
                     <!-- Logo Dark -->
                     <a href="/" class="logo-dark">
                         <span class="logo-lg">
-                            <img src="{{asset('assets/images/logo-dark.png')}}" alt="dark logo">
+                            <img src="{{$websiteData->logo_website_url}}" alt="dark logo">
                         </span>
                         <span class="logo-sm">
-                            <img src="{{asset('assets/images/logo-dark.png')}}" alt="small logo">
+                            <img src="{{$websiteData->logo_website_url}}" alt="small logo">
                         </span>
                     </a>
                 </div>
@@ -43,11 +44,11 @@
             </div>
 
             <ul class="topbar-menu d-flex align-items-center gap-3">
-                <li class="d-none d-sm-inline-block">
+                <!-- <li class="d-none d-sm-inline-block">
                     <div class="nav-link" id="light-dark-mode">
                         <i class="ri-moon-line fs-22"></i>
                     </div>
-                </li>
+                </li> -->
                 @if (!request()->isGuest)
                   
 
@@ -96,22 +97,22 @@
         <!-- Brand Logo Light -->
         <a href="#" class="logo logo-light bg-danger">
             <span class="logo-lg">
-                <img src="{{asset('assets/images/logo-dark.png')}}" alt="logo" style="height: 35px !important;">
+                <img src="{{$websiteData->logo_website_url}}" alt="logo" style="height: 35px !important;">
                 <span class="logo-txt text-white">{{config('app.name')}}</span>
             </span>
             <span class="logo-sm">
-                <img src="{{asset('assets/images/logo-dark.png')}}" alt="small logo">
+                <img src="{{$websiteData->logo_website_url}}" alt="small logo">
             </span>
         </a>
 
         <!-- Brand Logo Dark -->
         <a href="#" class="logo logo-dark">
             <span class="logo-lg">
-                <img src="{{asset('assets/images/logo-dark.png')}}" alt="logo" style="height: 35px !important;">
-                <span class="logo-txt text-white">{{config('app.name')}} </span>
+                <img src="{{$websiteData->logo_website_url}}" alt="logo" style="height: 35px !important;">
+                <span class="logo-txt text-white">{{$websiteData->nama}}</span>
             </span>
             <span class="logo-sm">
-                <img src="{{asset('assets/images/logo-dark.png')}}" alt="small logo">
+                <img src="{{$websiteData->logo_website_url}}" alt="small logo">
             </span>
         </a>
 

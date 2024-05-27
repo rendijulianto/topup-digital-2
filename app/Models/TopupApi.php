@@ -24,23 +24,6 @@ class TopupApi extends Model
         'status'
     ];
 
-    public function getStatusHtmlAttribute()
-    {
-        switch($this->status){
-        case 'pending':
-            return '<span class="badge bg-warning-subtle text-warning rounded-pill">Pending</span>';
-            break;
-        case 'sukses':
-            return '<span class="badge bg-success-subtle text-success rounded-pill">Sukses</span>';
-            break;
-        case 'gagal':	
-            return '<span class="badge bg-danger-subtle text-danger rounded-pill">Gagal</span>';
-            break;
-        default :
-            return '<span class="badge bg-warning-subtle text-warning rounded-pill">Pending</span>';
-        }
-    }
-
     // relationship
     public function topup()
     {

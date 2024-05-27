@@ -17,16 +17,6 @@
                 <a href="{{route('vouchers.index')}}" class="btn btn-primary btn-sm"><i class="mdi mdi-arrow-left"></i> Kembali</a>
             </div>
             <div class="card-body">
-                @if (session('success'))
-                   <div class="alert alert-success">
-                        {{session('success')}}
-                   </div>
-                @elseif (session('error'))
-                   <div class="alert alert-danger">
-                          {{session('error')}}
-                   </div>
-                @endif
-
                 <form action="{{route('vouchers.store')}}" method="POST" enctype="multipart/form-data" class="row">
                     @csrf
                     <div class="mb-3 col-6">

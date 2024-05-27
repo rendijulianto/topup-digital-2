@@ -9,16 +9,13 @@ class Prefix extends Model
 {
     use HasFactory;
 
-    // table name
     protected $table = 'prefix';
 
-    // fillable attrib
     protected $fillable = [
         'brand_id',
         'nomor',
     ];
 
-    // scopeBrand,scopeSearch
     public function scopeBrand($query, $brand_id)
     {
        if ($brand_id) {
@@ -39,9 +36,6 @@ class Prefix extends Model
         return $query;
     }
 
-   
-
-    // relationship
     public function brand()
     {
         return $this->belongsTo(Brand::class);

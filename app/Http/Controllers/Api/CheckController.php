@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
-use Gonon\Digiflazz\{Digiflazz,Transaction,Balance};
-use App\Models\{CekNama, Brand, Kategori, Topup,CekVoucher};
-use Illuminate\Support\Str;
+use App\Models\{CekNama, Topup,CekVoucher};
 use Illuminate\Http\Request;
 // service Digiflazz
 use App\Services\DigiflazzService;
 set_time_limit(3600);
 class CheckController extends Controller
 {
-
 
     public function eWallet(Request $request)
     {   
@@ -64,13 +61,12 @@ class CheckController extends Controller
     
         $startTime = microtime(true);
         $timeLimit = 20;
-        $digiflazzService = new DigiflazzService();
         while (true) {
             
-            $validateEWallet = $digiflazzService->validateEWallet($params);
+            $validateEWallet = DigiflazzService::validateEWallet($params);
 
             if (!$validateEWallet['status']) {
-                if ($validateEWallet['message'] == "SKU tidak di temukan atau Non-Aktif") {
+                if ($validateEWallet['message'] == "SKU tidak di temukan atau Non-Aktif" || $validateEWallet['message'] == "Produk sedang Gangguan (Non Aktif)") {
                     return response()->json([
                         'status' => true,
                         'data' => [
@@ -168,9 +164,9 @@ class CheckController extends Controller
     
         $startTime = microtime(true);
         $timeLimit = 20;
-        $digiflazzService = new DigiflazzService();
+        
         while (true) {
-            $validateVoucher = $digiflazzService->validateVoucher($params);
+            $validateVoucher = DigiflazzService::validateVoucher($params);
             if (!$validateVoucher['status']) {
                 return response()->json([
                     'status' => false,
@@ -246,9 +242,7 @@ class CheckController extends Controller
                 'customer_no' => $request->nomor,
             ];
 
-            $digiflazzService = new DigiflazzService();
-
-            $iquiryPLN = $digiflazzService->validatePLN($params);
+            $iquiryPLN = DigiflazzService::validatePLN($params);
             if ($iquiryPLN['status'] == false) {
                 return response()->json([
                     'status' => false,
@@ -269,7 +263,7 @@ class CheckController extends Controller
         }
     }
 
-    public function profile()
+    public function balance()
     {
         try {
             $digiflazz = new DigiflazzService();

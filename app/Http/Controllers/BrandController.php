@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Models\LogAktivitas;
 class BrandController extends Controller
 {
@@ -74,14 +73,6 @@ class BrandController extends Controller
             ],500);
         }
 
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Brand $brand)
-    {
-        return view('web.pages.brand.show', compact('brand'));
     }
 
     /**

@@ -18,12 +18,6 @@ class LogAktivitas extends Model
         'user_agent',
     ];
 
-    public function pengguna()
-    {
-        return $this->belongsTo(Pengguna::class, 'pengguna_id');
-    }
-
-    // scopeSearch
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
@@ -33,6 +27,9 @@ class LogAktivitas extends Model
         return $query;
     }
 
-    // observe
-    
+    public function pengguna()
+    {
+        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+    }
+
 }

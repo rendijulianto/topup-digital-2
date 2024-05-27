@@ -15,18 +15,6 @@
 @endsection
 @section('content')
 <div class="row">
-    
-    <div class="col-12">
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{session('success')}}
-            </div>
-        @elseif (session('error'))
-            <div class="alert alert-danger">
-                {{session('error')}}
-            </div>
-        @endif
-    </div>
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">

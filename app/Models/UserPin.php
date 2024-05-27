@@ -15,11 +15,4 @@ class PenggunaPin extends Model
         'pengguna_id',
         'pin',
     ];
-
-    public function pengguna()
-    {
-        return $this->belongsTo(Pengguna::class);
-    }
-    
-
 }

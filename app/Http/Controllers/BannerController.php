@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Banner;
 use App\Models\LogAktivitas;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Intervention\Image\ImageManagerStatic;
-use Webp;
+
 
 
 class BannerController extends Controller
@@ -55,7 +53,8 @@ class BannerController extends Controller
         try {
           
             $imageName = time() . '.' . $request->gambar->extension();
-            $request->gambar->move(public_path('banners'), $imageName);
+            $request->file('gambar')->move('banners', $imageName);
+            // $request->gambar->move(public_path('banners'), $imageName);
      
 
             Banner::create([
@@ -117,7 +116,7 @@ class BannerController extends Controller
                 }
 
                 $imageName = time() . '.' . $request->gambar->extension();
-                $request->gambar->move(public_path('banners'), $imageName);
+                $request->file('gambar')->move('banners', $imageName);
             } else {
                 $imageName = $banner->gambar;
             }

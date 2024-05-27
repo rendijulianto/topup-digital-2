@@ -18,7 +18,7 @@
         <span> Pembelian Voucher Fisik  </span>
     </a>
 </li>
-<li class="side-nav-title">Topup</li>
+<!-- <li class="side-nav-title">Topup</li>
 <li class="side-nav-item">
     <a href="{{route('topup.create', ['category' => 'pulsa'])}}"
     class="side-nav-link">
@@ -45,21 +45,9 @@
     </a>
 </li>
 <li class="side-nav-item">
-    <a href="{{route('topup.create', ['category' => 'Paket SMS & Telpon'])}}" class="side-nav-link">
-        <i class="ri-phone-line"></i>
-        <span> Paket Sms & Telpon </span>
-    </a>
-</li>
-<li class="side-nav-item">
     <a href="{{route('topup.create', ['category' => 'masa aktif'])}}" class="side-nav-link">
         <i class="ri-health-book-line"></i>
         <span> Tambah Masa Aktif  </span>
-    </a>
-</li>
-<li class="side-nav-item">
-    <a href="{{route('cashier.vouchers.create')}}" class="side-nav-link">
-        <i class="fa fa-syringe"></i>
-        <span> Aktivasi Voucher</span>
     </a>
 </li>
 <li class="side-nav-item">
@@ -68,23 +56,4 @@
         <i class="ri-ticket-line"></i>
         <span> Voucher Fisik  </span>
     </a>
-</li>
-
-{{-- <li class="side-nav-item">
-    <a data-bs-toggle="collapse" href="#sidebarBaseUI" aria-expanded="false" aria-controls="sidebarBaseUI" class="side-nav-link">
-        <i class="ri-briefcase-line"></i>
-        <span> Voucher Fisik </span>
-        <span class="menu-arrow"></span>
-    </a>
-    <div class="collapse" id="sidebarBaseUI">
-        <ul class="side-nav-second-level">
-            <li>
-                <a href="ui-accordions.html">Pembelian Baru</a>
-            </li>
-            <li>
-                <a href="ui-alerts.html">Pengembalian</a>
-            </li>
-        </ul>
-    </div>
-</li> --}}
-{{-- @include('web.layout.menu_guest') --}}
+</li> -->

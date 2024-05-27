@@ -72,10 +72,6 @@ class PrefixController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Prefix $prefix)
-    {
-        return view('web.pages.prefix.show', compact('prefix'));
-    }
 
     /**
      * Show the form for editing the specified resource.

@@ -6,15 +6,6 @@
 <div class="row">
     <div class="col-12">
         <div class="page-title-box">
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">{{config('app.name')}}</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Halaman</a></li>
-                    <li class="breadcrumb-item active">
-                        Laporan Voucher 
-                    </li>
-                </ol>
-            </div>
             <h4 class="page-title">
                 <i class="ri ri-shopping-cart-2-line"></i>
                 Laporan Voucher 

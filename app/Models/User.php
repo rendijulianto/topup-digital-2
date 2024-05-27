@@ -2,44 +2,74 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Model;
 
-class User extends Authenticatable
+class Pengguna extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // Your model implementation
+    
+
+    protected $guarded = ['id'];
+
+    public function getAuthIdentifierName()
+    {
+        return 'id'; // Replace 'id' with the name of your primary key column
+    }
+
+    public function getAuthIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+    
+
+    // table name
+    protected $table = 'pengguna';
+
+    // primary key
+    protected $primaryKey = 'id';
+
+    // fillable attrib
     protected $fillable = [
-        'name',
+        'nama',
         'email',
         'password',
+        'jabatan',
+        'token'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'kata_sandi',
+        'pin'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
+    // search
+    public function scopeSearch($query, $request)
+    {
+        if ($request->search){
+            $query->where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%')
+                ->orWhere('jabatan', 'like', '%' . $request->search . '%');
+        }
+
+        // jabatan
+        if ($request->has('jabatan') && $request->jabatan != 'Semua') {
+            $query->where('jabatan', $request->jabatan);
+        }
+
+        return $query;
+    }
+
+
+    public function pin()
+    {
+        return $this->hasOne(PenggunaPin::class, 'pengguna_id', 'id');
+    }
 }

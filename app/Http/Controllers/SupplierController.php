@@ -137,12 +137,10 @@ class SupplierController extends Controller
     // performance
     public function report(Request $request)
     {
-    
         $suppliers = Supplier::
         performance($request)
         ->orderBy('total_transaksi','desc')->
         get();
-        
         return view('web.pages.supplier.performance', compact('suppliers'));
     }
 

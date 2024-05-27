@@ -12,8 +12,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
-
-
     public function customer(Request $request)
     {
         $banners = Banner::
@@ -37,7 +35,7 @@ class DashboardController extends Controller
         $request->end = $end->format('Y-m-d');
         $request->jumlah = 10;
     
-        $reportAdmin = Topup::reportAdmin($request);
+        $reportAdmin = Topup::getReportAdmin($request);
         $products = Produk::bestSeller($request)->get();
         $products = $products->map(function ($product) {
             $product->nama = Str::replaceFirst('Aktivasi ', '', $product->nama);
@@ -93,7 +91,7 @@ class DashboardController extends Controller
         $request->end = $request->end ?? Carbon::now()->endOfWeek();
         $today= Carbon::now();
         $yesterday = Carbon::yesterday();
-        $report = Topup::reportInject($request);
+        $report = Topup::getReportInject($request);
     
         $report = collect($report);
         $incomeToday = $report[$today->toDateString()]['sukses'] ? $report[$today->toDateString()]['sukses'] + $report[$today->toDateString()]['pending'] : 0;

@@ -18,30 +18,8 @@
     // start-transaction
     $(document).on('click', '#start-transaction', function() {
         // buat browser baru 
-        window.open("http://localhost:8000?isGuest=true", "_blank", "toolbar=yes,top=500,left=500,width=400,height=400");
-
+        window.open("/?isGuest=true","_blank", "toolbar=yes,top=500,left=500,width=400,height=400");
     });
-
-    const formatAngka = (angka, tipe) => {
-        switch (tipe) {
-            case 'rupiah':
-                // angka = angka. to number();
-                angka = parseInt(angka);
-                // Ke rupiah Dengan format Rp 10.000
-                return new Intl.NumberFormat('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0
-                }).format(angka);
-                break;
-            case 'nomor':
-                return angka.toString().replace(/[^0-9]/g, '');
-                break;
-            default:
-                return angka;
-                break;
-        }
-    }
 </script>
 
 @yield('script')

@@ -19,16 +19,9 @@ class TopupVoucher extends Model
         'status',
     ];
 
-    // date
     protected $casts = [
         'tgl_kadaluarsa' => 'datetime',
     ];
-
-    // relationship
-    public function topup()
-    {
-        return $this->belongsTo(Topup::class);
-    }
 
     public $timestamps = false;
 

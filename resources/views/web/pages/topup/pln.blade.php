@@ -36,11 +36,7 @@
                                 <i class="fa fa-search"></i>
                                 Cek
                             </button>
-                            @if(Auth::guard('pengguna')->check() && !request()->has('isGuest'))
-                            <button class="btn btn-success" type="button" id="btnPelanggan">
-                                <i class="fa fa-address-book"></i> Pilih Pelanggan
-                            </button>
-                        @endif
+                          
                         </div>
                         <small class="text-muted">*Masukan nomor meter / ID pelanggan untuk melihat produk</small>
                     </div>

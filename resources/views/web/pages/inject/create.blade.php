@@ -89,11 +89,29 @@
                                 </div>
                             @enderror
                         </div>
-                       
+                        <div class="col-6 mb-3">
+                            <label for="days" class="form-label"><span class="circle-icon">6</span> Expired Hari</label>
+                            <input type="number" name="days" id="days" class="form-control   @error('tgl_kadaluwarsa') is-invalid @enderror">
+                            @error('days')
+                                <div class="invalid-feedback">
+                                    {{$message}}
+                                </div>
+                            @enderror
+                        </div>
+            
                         <div class="col-6">
                             <label for="pin" class="form-label"><span class="circle-icon">7</span> Pin</label>
                             <input type="password" class="form-control" @error('pin') is-invalid @enderror id="pin" name="pin"  maxlength="6" placeholder="Masukkan pin anda">
                            
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="price_sell" class="form-label"><span class="circle-icon">8</span> Harga Jual</label>
+                            <input type="text" readonly name="price_sell" id="price_sell" class="form-control  @error('tgl_kadaluwarsa') is-invalid @enderror">
+                            @error('price_sell')
+                                <div class="invalid-feedback">
+                                    {{$message}}
+                                </div>
+                            @enderror
                         </div>
                     </div>
                 </form>
@@ -116,7 +134,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <label for="number" class="form-label"><span class="circle-icon">8</span> Nomor Seri</label>
+                        <label for="number" class="form-label"><span class="circle-icon">9</span> Nomor Seri</label>
                         <div class="input-group mb-3">
                             <input type="number" name="search" class="form-control no-seri" placeholder="Masukkan no seri voucher" onkeypress="return event.keyCode === 8 || event.charCode >= 48 && event.charCode <= 57">
                             <button class="btn btn-danger" type="submit" id="button-addon2"><i class="fa fa-trash"></i></button>
@@ -166,14 +184,16 @@
     socket.on('connect', function(){
         console.log('connected');
     });              
+
+
+
     socket.on('update-topup', function(data){
         let dataTopup = data.data;
         console.log(dataTopup);
         let topup = $(`tr[data-id="${dataTopup.data.id}"]`);
         console.log(topup.length);
         if(topup.length > 0) {
-            console.log('Stauts updated ' + dataTopup.data.id);
-            // jika status mengandung berhasil
+
             if(dataTopup.data.status.includes('Sukses')) {
                 $('#btnStatus_' + dataTopup.data.id).html(``);
                 $.toast({
@@ -183,9 +203,7 @@
                     type: 'success',
                     delay: 5000
                 });
-                // https://dm0qx8t0i9gc9.cloudfront.net/previews/audio/BsTwCwBHBjzwub4i4/audioblocks-correct-answer-hint-accept-5_HFD0bIADI_NWM.mp3
-                let audio = new Audio('https://dm0qx8t0i9gc9.cloudfront.net/previews/audio/BsTwCwBHBjzwub4i4/audioblocks-correct-answer-hint-accept-5_HFD0bIADI_NWM.mp3');
-                audio.play();
+             
             } else if(dataTopup.data.status.includes('Gagal')) {
                 $('#btnStatus_' + dataTopup.data.id).html(` <button type="button" class="btn btn-sm btn-danger mb-2" data-toggle="modal" 
                                                 data-topup_number="${dataTopup.data.nomor}"
@@ -232,6 +250,9 @@
             }
         });
     }
+
+
+
 
     // updateProduk
     function updateProduk()
@@ -315,18 +336,35 @@
         }
     });
 
-    // brand berubah maka voucher,tipe,product, dan supplier akan berubah ke default
-
-
-    // jika tipe berubah maka product dan supplier akan berubah ke default
     $('#type_id').on('change', function() {
         $('#product_id').html('<option value="" disabled selected>Pilih Voucher</option>')
         $('#supplier_id').html('<option value="" disabled selected>Pilih Supplier</option>')
     });
 
-    // jika product berubah maka supplier akan berubah ke default
     $('#product_id').on('change', function() {
         $('#supplier_id').html('<option value="" disabled selected>Pilih Supplier</option>')
+    });
+
+    $('#days').on('keyup', function() {
+        let days = $(this).val();
+        let tgl_kadaluwarsa = new Date();
+        tgl_kadaluwarsa.setDate(tgl_kadaluwarsa.getDate() + parseInt(days));
+        let month = tgl_kadaluwarsa.getMonth() + 1;
+        let day = tgl_kadaluwarsa.getDate();
+        let year = tgl_kadaluwarsa.getFullYear();
+
+        $('#tgl_kadaluwarsa').val(year + '-' + month.toString().padStart(2, '0') + '-' + day.toString().padStart(2, '0'));
+    });
+
+    $('#tgl_kadaluwarsa').on('change', function() {
+        let tgl_kadaluwarsa = $(this).val();
+        let tgl = new Date(tgl_kadaluwarsa);
+        let now = new Date();
+        let diff = tgl - now;
+        let days = diff / (1000 * 60 * 60 * 24);
+        // bulatkan ke bawah
+        days = Math.floor(days)+1;
+        $('#days').val(days);
     });
 
     // jika brand berubah maka voucher akan berubah
@@ -412,7 +450,8 @@
         let product_id = $(this).val();
         let link = "{{route('api.products.supplier', ':product_id')}}";
         link = link.replace(':product_id', product_id);
-        $('input[name="price"]').val($(this).find(':selected').data('price'));
+        $('input[name="price_sell"]').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0
+             }).format($(this).find(':selected').data('price')));
         $('#supplier_id').html('<option value="">Pilih Supplier</option>')
         $.ajax({
             url: link,

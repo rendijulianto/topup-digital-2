@@ -3,30 +3,12 @@
 namespace App\Http\Controllers\Cron;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-// use App\Models\{Kategori, Brand, Tipe, Produk, Supplier,TopupApi};
-use Illuminate\Support\Str;
 // set_time_limit(3600);
-use App\Services\{DigiflazzService,PiwapiService,SocketService}
-use Gonon\Digiflazz\{Digiflazz,Transaction,PriceList,Balance};
-
+use App\Services\{DigiflazzService,PiwapiService,SocketService};
 // TopupApi
 use App\Models\TopupApi;
 class TopupController extends Controller
 { 
-
-    public function index()
-    {
-        $params = [
-            'ref_id' => '1710669943561',
-            'buyer_sku_code' => 'avt151h2',
-            'customer_no' => '082166555',
-        ];
-        
-        $createTransaction = new DigiflazzService();
-        $response = $createTransaction->createTransaction($params);
-        dd($params, $response);
-    }
     public function update()
     {
         $topupApi = TopupApi::where('status', 'pending')->take(10)->orderBy('updated_at', 'asc')->get();
@@ -42,7 +24,7 @@ class TopupController extends Controller
                         'customer_no' => $number,
                     ];
                     $digiflazzService = new DigiflazzService();
-                    $createTransaction = $digiflazzService->createTransaction($params);
+                    $createTransaction = DigiflazzService::createTransaction($params);
                     if ($createTransaction['status']) {
                         $api->status = $createTransaction['data']['status'];
                         $api->keterangan = $createTransaction['data']['message'];
