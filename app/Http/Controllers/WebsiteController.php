@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{LogAktivitas,Website};
+use App\Models\{ActivityLog,Website};
 use Illuminate\Http\Request;
 
 
@@ -20,22 +20,22 @@ class WebsiteController extends Controller
     public function update(Request $request, Website $website)
     {
         $this->validate($request, [
-            'nama' => 'required|string|max:50',
-            'alamat' => 'required|string|max:50',
-            'nomor_telepon' => 'required|string|max:15',
+            'name' => 'required|string|max:50',
+            'address' => 'required|string|max:50',
+            'telp' => 'required|string|max:15',
             'logo_website' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
             'logo_print' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 50 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
-            'alamat.required' => 'Alamat tidak boleh kosong!',
-            'alamat.string' => 'Alamat harus berupa string!',
-            'alamat.max' => 'Alamat maksimal 50 karakter!',
-            'nomor_telepon.required' => 'Nomor telepon tidak boleh kosong!',
-            'nomor_telepon.string' => 'Nomor telepon harus berupa string!',
-            'nomor_telepon.max' => 'Nomor telepon maksimal 15 karakter!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 50 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
+            'address.required' => 'Alamat tidak boleh kosong!',
+            'address.string' => 'Alamat harus berupa string!',
+            'address.max' => 'Alamat maksimal 50 karakter!',
+            'telp.required' => 'Nomor telepon tidak boleh kosong!',
+            'telp.string' => 'Nomor telepon harus berupa string!',
+            'telp.max' => 'Nomor telepon maksimal 15 karakter!',
             'logo_website.image' => 'Logo website harus berupa gambar!',
             'logo_website.max' => 'Logo website maksimal 2MB!',
             'logo_website.mimes' => 'Logo website harus berupa JPG, JPEG, PNG, atau WEBP!',
@@ -58,17 +58,17 @@ class WebsiteController extends Controller
 
 
             $website->update([
-                'nama' => $request->nama,
-                'alamat' => $request->alamat,
-                'nomor_telepon' => $request->nomor_telepon,
+                'name' => $request->name,
+                'address' => $request->address,
+                'telp' => $request->telp,
                 'logo_website' => $request->hasFile('logo_website') ? $logo_website : $website->logo_website,
                 'logo_print' => $request->hasFile('logo_print') ? $logo_print : $website->logo_print,
             ]);
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Melakukan perubahan data website',
+                'note' => 'Melakukan perubahan data website',
                 'user_agent' => $request->header('User-Agent'),
             ]);
 

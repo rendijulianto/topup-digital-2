@@ -24,14 +24,14 @@ class PrefixSeeder extends Seeder
 
         foreach ($prefixes as $key => $value) {
             foreach ($value as $prefix) {
-                $brand = Brand::where('nama', 'like', '%'.$key.'%')->first();
+                $brand = Brand::where('name', 'like', '%'.$key.'%')->first();
                 if ($brand) {
                     $brand_id = $brand->id;
                 } else {
                     $brand_id = null;
                 }
                 Prefix::create([
-                    'nomor' => $prefix,
+                    'number' => $prefix,
                     'brand_id' => $brand_id,
                 ]);
             }

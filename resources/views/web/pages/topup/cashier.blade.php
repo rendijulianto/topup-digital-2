@@ -60,8 +60,8 @@
                                         <option value="">Semua</option>
                                         @foreach ($products as $product)
                                             <option
-                                            {{ request()->produk == $product->id ? 'selected' : '' }}
-                                            value="{{ $product->id }}">{{ $product->nama }}</option>
+                                            {{ request()->product == $product->id ? 'selected' : '' }}
+                                            value="{{ $product->id }}">{{ $product->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -173,26 +173,32 @@
                                                 #{{$topup->id}}
                                             </td>
                                             <td>
-                                                Layanan : {{ $topup->product_name }} <br>
-                                                Nomor : {{ $topup->nomor }} <br> 
+                                                Layanan : {{ $topup->product->name }} <br>
+                                                Nomor : {{ $topup->target }} <br> 
                                             </td>
                                             <td>
-                                                <b>Rp {{ number_format($topup->harga_jual, 0, ',', '.') }}</b>
+                                                <b>Rp {{ number_format($topup->price_sell, 0, ',', '.') }}</b>
                                             </td>
                                             <td>
-                                                {{ $topup->tgl_transaksi }}
+                                                {{ $topup->transacted_at }}
                                             </td>
                                             <td>
-                                                {!!$topup->status_html!!}
+                                                @if ($topup->status == "pending")
+                                                   <span class="badge bg-warning">Pending</span>
+                                                @elseif ($topup->status == "sukses")
+                                                    <span class="badge bg-success">Sukses</span>
+                                                @else
+                                                    <span class="badge bg-danger">Gagal</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <div id="btnStatus_{{ $topup->id }}">
                                                
                                                 @if($topup->status == "gagal" && $topup->created_at->diffInDays(today()) <= 1)
                                                 <button type="button" class="btn btn-sm btn-danger mb-2" data-toggle="modal" 
-                                                data-topup_number="{{ $topup->nomor }}"
-                                                data-topup_product_name="{{ $topup->product_name }}"
-                                                data-topup_price="Rp {{ number_format($topup->harga_jual, 0, ',', '.') }}"
+                                                data-topup_number="{{ $topup->target }}"
+                                                data-topup_product_name="{{ $topup->product->name }}"
+                                                data-topup_price="Rp {{ number_format($topup->price_sell, 0, ',', '.') }}"
                                                 data-topup_id="{{ $topup->id }}"
                                                 data-topup_customer_name="{{ $topup->customer_name }}"
                                                 data-topup_type="{{ $topup->tipe }}"
@@ -201,11 +207,11 @@
                                                   Kirim Ulang
                                                     
                                                 </button>
-                                                @elseif ($topup->status == "pending" && ($topup->harga_beli == null OR $topup->tipe_produk->nama == "Custom"))
+                                                @elseif ($topup->status == "pending" && $topup->topup_api()->count() == 0)
                                                     <button type="button" class="btn btn-sm btn-success mb-2" data-toggle="modal" 
-                                                    data-topup_number="{{ $topup->nomor }}"
-                                                    data-topup_product_name="{{ $topup->product_name }}"
-                                                    data-topup_price="Rp {{ number_format($topup->harga_jual, 0, ',', '.') }}"
+                                                    data-topup_number="{{ $topup->target }}"
+                                                    data-topup_product_name="{{ $topup->product->name }}"
+                                                    data-topup_price="Rp {{ number_format($topup->price_sell, 0, ',', '.') }}"
                                                     data-topup_id="{{ $topup->id }}"
                                                     data-topup_type="{{ $topup->tipe }}"
                                                     data-topup_customer_name="{{ $topup->customer_name }}"
@@ -217,10 +223,7 @@
                                                         <i class="fa fa-times"></i>
                                                         Batal
                                                     </button>
-                                                @elseif ($topup->status == "pending")
-                                                    <button type="button" class="btn btn-sm btn-success mb-2" onClick="handleCheckStatus('{{ $topup->id }}', '{{ $topup->status }}')">
-                                                        <i class="fa fa-refresh"></i>
-                                                        Cek Status</button>
+                            
                                                 @endif
                                                 </div>
                                                 <button type="button" class="btn btn-sm btn-primary mb-2" 
@@ -338,12 +341,12 @@
                 audio.play();
             } else if(dataTopup.data.status.includes('Gagal')) {
                 $('#btnStatus_' + dataTopup.data.id).html(` <button type="button" class="btn btn-sm btn-danger mb-2" data-toggle="modal" 
-                                                data-topup_number="${dataTopup.data.nomor}"
-                                                data-topup_product_name="${dataTopup.data.produk}"
-                                                data-topup_price="Rp ${dataTopup.data.harga}"
+                                                data-topup_number="${dataTopup.data.target}"
+                                                data-topup_product_name="${dataTopup.data.product}"
+                                                data-topup_price="Rp ${dataTopup.data.price}"
                                                 data-topup_id="${dataTopup.data.id}"
-                                                data-topup_customer_name="${dataTopup.data.nama_pelanggan}"
-                                                data-topup_type="${dataTopup.data.tipe}"
+                                                data-topup_customer_name="${dataTopup.data.customer_name}"
+                                                data-topup_type="${dataTopup.data.type}"
                                                 onclick="handleConfirmTopup(this)">
                                                     <i class="fa fa-redo"></i>
                                                   Kirim Ulang
@@ -440,9 +443,10 @@
                         </div>
                     </div>
                     <div class="col-lg-12">
-                        <label for="supplier" class="form-label">Supplier</label>
-                        <select class="form-select" id="supplier" name="supplier"></select>
-                        
+                        <div class="mb-3">
+                            <label for="supplier" class="form-label">Supplier</label>
+                            <select class="form-select" id="supplier" name="supplier"></select>
+                        </div>
                     </div>
                     <div class="col-lg-12">
                         <label for="pin" class="form-label">Pin Transaksi <i class="fa fa-info-circle" data-toggle="tooltip"
@@ -527,6 +531,15 @@
                     $.ajax({
                         url: url,
                         type: "GET",
+                        beforeSend: function () {
+                            Swal.fire({
+                                title: 'Mohon Tunggu',
+                                html: 'Sedang memproses...',
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                },
+                            }) 
+                        },
                         success: function (response) {
                             Swal.fire({
                                 icon: 'success',
@@ -581,13 +594,13 @@
                 <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_nomor" class="form-label">Nomor</label>
-                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.nomor}" readonly>
+                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.target}" readonly>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="detail_nama_pelanggan" class="form-label">Nama Pelanggan</label>
-                            <input type="text" class="form-control" id="detail_nama_pelanggan" readonly value="${response.data.detail.nama_pelanggan}">
+                            <label for="detail_name_pelanggan" class="form-label">Nama Pelanggan</label>
+                            <input type="text" class="form-control" id="detail_name_pelanggan" readonly value="${response.data.detail.customer_name}">
                         </div>
                     </div>
                     
@@ -597,7 +610,7 @@
                     <div class="col-lg-12">
                         <div class="mb-3">
                             <label for="detail_nomor" class="form-label">Nomor</label>
-                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.nomor}" readonly>
+                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.target}" readonly>
                         </div>
                     </div>
                     `;
@@ -605,21 +618,21 @@
                 html = html + `
                 <div class="col-lg-6">
                     <div class="mb-3">
-                        <label for="detail_produk" class="form-label">Produk</label>
-                        <input type="text" class="form-control" id="detail_produk" readonly value="${response.data.produk}">
+                        <label for="detail_product" class="form-label">Produk</label>
+                        <input type="text" class="form-control" id="detail_product" readonly value="${response.data.product}">
                     </div>
                 </div>
                    
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_harga" class="form-label">Harga</label>
-                            <input type="text" class="form-control" id="detail_harga" readonly value="${response.data.harga}">
+                            <input type="text" class="form-control" id="detail_harga" readonly value="${response.data.price_sell}">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_keterangan" class="form-label">Keterangan</label>
-                            <input type="text" class="form-control" id="detail_keterangan" readonly value="${response.data.keterangan}">
+                            <input type="text" class="form-control" id="detail_keterangan" readonly value="${response.data.note}">
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -631,7 +644,7 @@
                     <div class="col-lg-3">
                         <div class="mb-3">
                             <label for="detail_tgl_transaksi" class="form-label">Tgl Transaksi</label>
-                            <input type="datetime" class="form-control" id="detail_tgl_transaksi" readonly value="${response.data.tgl_transaksi}">
+                            <input type="datetime" class="form-control" id="detail_tgl_transaksi" readonly value="${response.data.transacted_at}">
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -643,7 +656,7 @@
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_kasir" class="form-label">Kasir</label>
-                            <input type="text" class="form-control" id="detail_kasir" readonly value="Rendi Julianto">
+                            <input type="text" class="form-control" id="detail_kasir" readonly value="${response.data.cashier}">
                         </div>
                     </div>
                     <div class="col-lg-12">
@@ -673,10 +686,10 @@
                                     ${value.supplier}
                                 </td>
                                 <td>
-                                    ${value.keterangan}
+                                    ${value.note}
                                 </td>
                                 <td>
-                                    ${value.waktu}
+                                    ${value.created_at}
                                 </td>
                                 <td>
                                     ${value.status}
@@ -777,7 +790,7 @@
             url: url,
             type: "POST",
             data: {
-                supplier_produk_id: supplier,
+                product_supplier_id: supplier,
                 _token: "{{ csrf_token() }}",
                 pin: pin
             },
@@ -871,7 +884,7 @@
         const end = $('#reportrange').data('daterangepicker').endDate.format('YYYY-MM-DD');
         const status = document.querySelector('select[name="status"]').value;
         const product = document.querySelector('select[name="product"]').value;
-        window.location.href = `{{ route('cashier.topup') }}?search=${search}&start=${start}&end=${end}&status=${status}&produk=${product}`;
+        window.location.href = `{{ route('cashier.topup') }}?search=${search}&start=${start}&end=${end}&status=${status}&product=${product}`;
     }
 
    $('.select-2').on('change', function() {

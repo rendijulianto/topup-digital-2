@@ -9,11 +9,11 @@ class Prefix extends Model
 {
     use HasFactory;
 
-    protected $table = 'prefix';
+    protected $table = 'prefixs';
 
     protected $fillable = [
         'brand_id',
-        'nomor',
+        'number',
     ];
 
     public function scopeBrand($query, $brand_id)
@@ -26,7 +26,7 @@ class Prefix extends Model
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
-             $query->where('nomor', 'like', '%' . $request->search . '%');
+             $query->where('number', 'like', '%' . $request->search . '%');
         }
 
         if ($request->brand && $request->brand != 'Semua') {

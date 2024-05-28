@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Brand, Kategori, Tipe, Produk, Supplier, SupplierProduk, LogAktivitas};
+use App\Models\{Brand, Category, Type, Product, Supplier, ProductSupplier, ActivityLog};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 class ProductController extends Controller
@@ -15,13 +15,13 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Produk::
+        $products = Product::
         search($request)->
-        with('kategori', 'brand', 'tipe')->paginate(config('app.pagination.default'));
-        $categories = Kategori::orderBy('nama')->get();
-        $brands = Brand::orderBy('nama')->get();
-        $types = Tipe::orderBy('nama')->get();
-        $suppliers = Supplier::orderBy('nama')->get();
+        with('category', 'brand', 'type')->paginate(config('app.pagination.default'));
+        $categories = Category::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+        $types = Type::orderBy('name')->get();
+        $suppliers = Supplier::orderBy('name')->get();
 
         return view('web.pages.product.index', compact('categories', 'brands', 'types', 'products', 'suppliers'));
     }
@@ -31,9 +31,9 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $categories = Kategori::orderBy('nama')->get();
-        $brands = Brand::orderBy('nama')->get();
-        $types = Tipe::orderBy('nama')->get();
+        $categories = Category::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+        $types = Type::orderBy('name')->get();
         return view('web.pages.product.create', compact('categories', 'brands', 'types'));
     }
 
@@ -43,21 +43,21 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kategori_id' => 'required|exists:kategori,id',
-            'tipe_id' => 'required|exists:tipe,id',
-            'brand_id' => 'required|exists:brand,id',
-            'harga' => 'required|numeric',
-            'deskripsi' => 'required',
+            'name' => 'required',
+            'category_id' => 'required|exists:categories,id',
+            'type_id' => 'required|exists:types,id',
+            'brand_id' => 'required|exists:brands,id',
+            'price' => 'required|numeric',
+            'description' => 'required',
         ]);
         // dd($request->all());
         DB::beginTransaction();
         try {
-            Produk::create($request->all());
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            Product::create($request->all());
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan produk ' . $request->nama,
+                'note' => 'Menambahkan produk ' . $request->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             DB::commit();
@@ -78,12 +78,12 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Produk $product)
+    public function edit(Product $product)
     {
-        $categories = Kategori::orderBy('nama')->get();
-        $brands = Brand::orderBy('nama')->get();
-        $types = Tipe::orderBy('nama')->get();
-        $suppliers = Supplier::orderBy('nama')->get();
+        $categories = Category::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+        $types = Type::orderBy('name')->get();
+        $suppliers = Supplier::orderBy('name')->get();
 
         return view('web.pages.product.edit', compact('product', 'categories', 'brands', 'types', 'suppliers'));
     }
@@ -91,23 +91,24 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Produk $product)
+    public function update(Request $request, Product $product)
     {
         $this->validate($request, [
-            'nama' => 'required',
-            'kategori_id' => 'required|exists:kategori,id',
-            'tipe_id' => 'required|exists:tipe,id',
-            'brand_id' => 'required|exists:brand,id',
-            'harga' => 'required|numeric',
-            'deskripsi' => 'required',
+            'name' => 'required',
+            'category_id' => 'required|exists:categories,id',
+            'type_id' => 'required|exists:types,id',
+            'brand_id' => 'required|exists:brands,id',
+            'price' => 'required|numeric',
+            'description' => 'required',
         ]);
         DB::beginTransaction();
         try {
+       
             $product->update($request->all());
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengupdate produk ' . $request->nama,
+                'note' => 'Mengupdate produk ' . $request->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
@@ -129,15 +130,15 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Produk $product)
+    public function destroy(Product $product)
     {
         DB::beginTransaction();
         try {
             $product->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => request()->ip(),
-                'keterangan' => 'Menghapus produk ' . $product->nama,
+                'note' => 'Menghapus produk ' . $product->name,
                 'user_agent' => request()->header('User-Agent'),
             ]);
             DB::commit();
@@ -149,25 +150,25 @@ class ProductController extends Controller
     }
 
 
-    public function supplier(Request $request, Produk $product)
+    public function supplier(Request $request, Product $product)
     {
-        $products = $product->supplier_produk()->paginate(config('app.pagination.default'));
+        $products = $product->product_suppliers()->paginate(config('app.pagination.default'));
         return view('web.pages.product.supplier', compact('product', 'products'));
     }
 
     
-    public function createSupplier(Request $request, Produk $product)
+    public function createSupplier(Request $request, Product $product)
     {
-        $suppliers = Supplier::orderBy('nama')->get();
+        $suppliers = Supplier::orderBy('name')->get();
         return view('web.pages.product.create-supplier', compact('product', 'suppliers'));
     }
 
-    public function storeSupplier(Request $request, Produk $product)
+    public function storeSupplier(Request $request, Product $product)
     {
         $this->validate($request, [
-            'supplier_id' => 'required|exists:supplier,id',
-            'harga' => 'required|numeric',
-            'stok' => 'required|numeric',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'price' => 'required|numeric',
+            'stock' => 'required|numeric',
             'status' => 'required|boolean',
             'multi' => 'required|boolean',
             'jam_buka' => 'nullable|date_format:H:i',
@@ -175,39 +176,39 @@ class ProductController extends Controller
         ]);
         DB::beginTransaction();
         try {
-            $product->supplier_produk()->create($request->all());
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            $product->product_suppliers()->create($request->all());
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan supplier produk ' . $product->nama,
+                'note' => 'Menambahkan produk supplier ' . $product->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             DB::commit();
             return response()->json([
                 'status' => true,
-                'message' => 'Berhasil menambahkan supplier produk'
+                'message' => 'Berhasil menambahkan produk supplier'
             ], 201);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
                 'status' => false,
-                'message' => 'Gagal menambahkan supplier produk'
+                'message' => 'Gagal menambahkan produk supplier'
             ], 500);
         }
     }
 
     
-    public function updateSupplier(Request $request, SupplierProduk $supplierProduct)
+    public function updateSupplier(Request $request, ProductSupplier $supplierProduct)
     {
         $this->validate($request, [
-            'supplier_id' => 'required|exists:supplier,id',
-            'harga' => 'required',
-            'stok' => 'required',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'price' => 'required',
+            'stock' => 'required',
             'status' => 'required|boolean',
             'multi' => 'required|boolean',
         ], [
-            'harga.numeric' => 'Harga harus berupa angka',
-            'stok.numeric' => 'Stok harus berupa angka',
+            'price.numeric' => 'Harga harus berupa angka',
+            'stock.numeric' => 'Stok harus berupa angka',
         ]);
         // validation.numeric
 
@@ -215,10 +216,10 @@ class ProductController extends Controller
         try {
 
             $supplierProduct->update($request->all());
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengupdate supplier produk ' . $supplierProduct->id,
+                'note' => 'Mengupdate produk supplier ' . $supplierProduct->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             DB::commit();
@@ -230,21 +231,21 @@ class ProductController extends Controller
     }
 
     //editSupplier
-    public function editSupplier(SupplierProduk $supplierProduct)
+    public function editSupplier(ProductSupplier $supplierProduct)
     {  
-        $suppliers = Supplier::orderBy('nama')->get();
+        $suppliers = Supplier::orderBy('name')->get();
         return view('web.pages.product.edit-supplier', compact('supplierProduct', 'suppliers'));
     }
 
-    public function destroySupplier(Request $request, SupplierProduk $supplierProduct)
+    public function destroySupplier(Request $request, ProductSupplier $supplierProduct)
     {
         DB::beginTransaction();
         try {
             $supplierProduct->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menghapus supplier produk ' . $supplierProduct->id,
+                'note' => 'Menghapus produk supplier ' . $supplierProduct->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             DB::commit();
@@ -256,25 +257,25 @@ class ProductController extends Controller
     }
 
     // editMasal
-    public function editMasal(Request $request)
+    public function editPrice(Request $request)
     {
-        $categories = Kategori::orderBy('nama')->get();
+        $categories = Category::orderBy('name')->get();
         return view('web.pages.product.edit-masal', compact('categories'));
     }
     
-    public function updateMasal(Request $request)
+    public function updatePrice(Request $request)
     {
         $this->validate($request, [
-            'harga' => 'required|array',
-            'harga.*' => 'required|numeric',
+            'price' => 'required|array',
+            'price.*' => 'required|numeric',
             'id' => 'required|array',
-            'id.*' => 'required|exists:produk,id',
+            'id.*' => 'required|exists:products,id',
         ]);
 
         foreach ($request->id as $key => $id) {
-            $product = Produk::find($id);
+            $product = Product::find($id);
             $product->update([
-                'harga' => $request->harga[$key]
+                'price' => $request->price[$key]
             ]);
         }
 

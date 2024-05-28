@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\{Brand, Prefix};
-use App\Models\LogAktivitas;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 class PrefixController extends Controller
@@ -14,8 +14,8 @@ class PrefixController extends Controller
     public function index(Request $request)
     {
         $prefixes = Prefix::search($request)
-        ->orderBy('nomor', 'asc')->paginate(config('app.pagination.default'));
-        $brands = Brand::category('pulsa')->orderBy('nama', 'asc')->get();
+        ->orderBy('number', 'asc')->paginate(config('app.pagination.default'));
+        $brands = Brand::category('pulsa')->orderBy('name', 'asc')->get();
         return view('web.pages.prefix.index', compact('prefixes', 'brands'));
     }
 
@@ -24,7 +24,7 @@ class PrefixController extends Controller
      */
     public function create()
     {
-        $brands = Brand::category('pulsa')->orderBy('nama', 'asc')->get();
+        $brands = Brand::category('pulsa')->orderBy('name', 'asc')->get();
 
         return view('web.pages.prefix.create', compact('brands'));
     }
@@ -35,26 +35,26 @@ class PrefixController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nomor' => ['required','string','max:5','unique:prefix,nomor'],
-            'brand_id' => ['required','exists:brand,id'],
+            'number' => ['required','string','max:5','unique:prefixs,number'],
+            'brand_id' => ['required','exists:brands,id'],
         ], [
-            'nomor.required' => 'Nomor tidak boleh kosong!',
-            'nomor.string' => 'Nomor harus berupa string!',
-            'nomor.max' => 'Nomor maksimal 5 karakter!',
-            'nomor.unique' => 'Nomor sudah terdaftar!',
+            'number.required' => 'Nomor tidak boleh kosong!',
+            'number.string' => 'Nomor harus berupa string!',
+            'number.max' => 'Nomor maksimal 5 karakter!',
+            'number.unique' => 'Nomor sudah terdaftar!',
             'brand_id.required' => 'Brand tidak boleh kosong!',
             'brand_id.exists' => 'Brand tidak ditemukan!',
         ]);
 
         try {
             $prefix = Prefix::create([
-                'nomor' => $request->nomor,
+                'number' => $request->number,
                 'brand_id' => $request->brand_id,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan prefix baru: ' . $prefix->nomor,
+                'note' => 'Menambahkan prefix baru: ' . $prefix->number,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([
@@ -78,7 +78,7 @@ class PrefixController extends Controller
      */
     public function edit(Prefix $prefix)
     {
-        $brands = Brand::category('pulsa')->orderBy('nama', 'asc')->get();
+        $brands = Brand::category('pulsa')->orderBy('name', 'asc')->get();
         return view('web.pages.prefix.edit', compact('prefix', 'brands'));
     }
 
@@ -88,25 +88,25 @@ class PrefixController extends Controller
     public function update(Request $request, Prefix $prefix)
     {
         $this->validate($request, [
-            'nomor' => ['required','string','max:5','unique:prefix,nomor,' . $prefix->id],
-            'brand_id' => ['nullable','exists:brand,id'],
+            'number' => ['required','string','max:5','unique:prefixs,number,' . $prefix->id],
+            'brand_id' => ['nullable','exists:brands,id'],
         ], [
-            'nomor.required' => 'Nomor tidak boleh kosong!',
-            'nomor.string' => 'Nomor harus berupa string!',
-            'nomor.max' => 'Nomor maksimal 5 karakter!',
-            'nomor.unique' => 'Nomor sudah terdaftar!',
+            'number.required' => 'Nomor tidak boleh kosong!',
+            'number.string' => 'Nomor harus berupa string!',
+            'number.max' => 'Nomor maksimal 5 karakter!',
+            'number.unique' => 'Nomor sudah terdaftar!',
             'brand_id.exists' => 'Brand tidak ditemukan!',
         ]);
 
         try {
             $prefix->update([
-                'nomor' => $request->nomor,
+                'number' => $request->number,
                 'brand_id' => $request->brand_id,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah prefix: ' . $prefix->nomor,
+                'note' => 'Mengubah prefix: ' . $prefix->number,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -128,10 +128,10 @@ class PrefixController extends Controller
     {
         try {
             $prefix->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => request()->ip(),
-                'keterangan' => 'Menghapus prefix: ' . $prefix->nomor,
+                'note' => 'Menghapus prefix: ' . $prefix->number,
                 'user_agent' => request()->header('User-Agent'),
             ]);
             return response()->json([

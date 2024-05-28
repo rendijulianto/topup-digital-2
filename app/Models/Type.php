@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tipe extends Model
+class Type extends Model
 {
     use HasFactory;
 
-    protected $table = 'tipe';
+    protected $table = 'types';
 
     protected $fillable = [
-        'nama'
+        'name'
     ];
 
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
-            $query = $query->where('nama', 'like', '%' . $request->search . '%');
+            $query = $query->where('name', 'like', '%' . $request->search . '%');
         }
         return $query;
     }
@@ -26,9 +26,9 @@ class Tipe extends Model
     public function scopeBrand($query, $brand)
     {
         if ($brand) {
-            return $query->whereHas('produk', function ($query) use ($brand) {
+            return $query->whereHas('product', function ($query) use ($brand) {
                 $query->whereHas('brand', function ($query) use ($brand) {
-                    $query->where('nama', $brand)->orWhere('id', $brand);
+                    $query->where('name', $brand)->orWhere('id', $brand);
                 });
             });
         }
@@ -37,16 +37,16 @@ class Tipe extends Model
     public function scopeCategory($query, $category)
     {
         if ($category) {
-            return $query->whereHas('produk', function ($query) use ($category) {
-                $query->whereHas('kategori', function ($query) use ($category) {
-                    $query->where('nama', $category)->orWhere('id', $category);
+            return $query->whereHas('product', function ($query) use ($category) {
+                $query->whereHas('category', function ($query) use ($category) {
+                    $query->where('name', $category)->orWhere('id', $category);
                 });
             });
         }
     }
 
-    public function produk()
+    public function product()
     {
-        return $this->hasMany(Produk::class, 'tipe_id', 'id');
+        return $this->hasMany(Product::class, 'type_id', 'id');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengguna;
 use Illuminate\Http\Request;
 // Topup
-use App\Models\{Topup, Produk,Banner};
+use App\Models\{Topup, Product,Banner};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -14,8 +14,7 @@ class DashboardController extends Controller
 {
     public function customer(Request $request)
     {
-        $banners = Banner::
-        where('status', true)->get();
+        $banners = Banner::orderby('created_at', 'desc')->get();
         return view('web.pages.dashboard.guest', compact('banners'));
     }
 
@@ -36,7 +35,7 @@ class DashboardController extends Controller
         $request->jumlah = 10;
     
         $reportAdmin = Topup::getReportAdmin($request);
-        $products = Produk::bestSeller($request)->get();
+        $products = Product::bestSeller($request)->get();
         $products = $products->map(function ($product) {
             $product->nama = Str::replaceFirst('Aktivasi ', '', $product->nama);
             return $product;
@@ -46,7 +45,7 @@ class DashboardController extends Controller
 
     public function cashier(Request $request)
     {   
-        $user = Auth::guard('pengguna')->user();
+        $user = Auth::guard()->user();
 
         $request->start = $request->start ??  Carbon::now()->startOfWeek();
         $request->kasir_id = $user->id;
@@ -84,7 +83,7 @@ class DashboardController extends Controller
 
     public function injector(Request $request)
     {
-        $user = Auth::guard('pengguna')->user();
+        $user = Auth::guard()->user();
 
         $request->start = $request->start ??  Carbon::now()->startOfWeek();
         $request->user_id = $user->id;

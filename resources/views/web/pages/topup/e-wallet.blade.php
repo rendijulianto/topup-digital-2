@@ -231,7 +231,7 @@
                 url: "{{route('api.brands.category')}}",
                 type: "GET",
                 data: {
-                    kategori: '{{$category}}'
+                    category: '{{$category}}'
                 },
                 beforeSend: function(){
                 
@@ -240,10 +240,10 @@
                     if(response.status == true){
                         $('#brand').html('');
                         $.each(response.data, function(index, brand){
-                            let link = `{{route('topup.create.brand', ['category' => ':category', 'brand' => ':id'])}}?isGuest={{request()->isGuest}}`;
+                            let link = `{{route('topup.create.brand', ['category' => ':category', 'brand' => ':id'])}}?isCustomer={{request()->isCustomer}}`;
                             
                             link = link.replace(':category', '{{strtolower($category)}}');
-                            link = link.replace(':id', brand.nama.toLowerCase());
+                            link = link.replace(':id', brand.name.toLowerCase());
                             $('#brand').append(`
                             <div class="col-lg-3">
                                 <a class="card" href="${link}">
@@ -252,7 +252,7 @@
                                             <img src="${brand.logo_url}"
                                             alt="" class="img-e-wallet">
                                         </div>
-                                        <label for="" class="mb-2">${brand.nama}</label>
+                                        <label for="" class="mb-2">${brand.name}</label>
                                         <div class="rounded w-100">
                                             <button class="btn btn-primary
                                             w-100"><i class="fa fa-plus-circle"></i> Pilih Topup</button>

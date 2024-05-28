@@ -5,21 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Kategori extends Model
+class Category extends Model
 {
     use HasFactory;
 
-    protected $table = 'kategori';
+    protected $table = 'categories';
 
     protected $fillable = [
-        'nama',
+        'name',
         'slug',
     ];
 
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
-            $query = $query->where('nama', 'like', '%' . $request->search . '%');
+            $query = $query->where('name', 'like', '%' . $request->search . '%');
         }
         return $query;
     }

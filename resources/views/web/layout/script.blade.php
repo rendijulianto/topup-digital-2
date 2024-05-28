@@ -18,7 +18,7 @@
     // start-transaction
     $(document).on('click', '#start-transaction', function() {
         // buat browser baru 
-        window.open("/?isGuest=true","_blank", "toolbar=yes,top=500,left=500,width=400,height=400");
+        window.open("/?isCustomer=true","_blank", "toolbar=yes,top=500,left=500,width=400,height=400");
     });
 </script>
 

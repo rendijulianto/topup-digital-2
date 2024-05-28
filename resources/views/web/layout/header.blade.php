@@ -27,11 +27,11 @@
                     </a>
                 </div>
 
+                @if (!request()->isCustomer)
                 <!-- Sidebar Menu Toggle Button -->
                 <button class="button-toggle-menu">
                     <i class="ri-menu-line"></i>
                 </button>
-
                 <!-- Horizontal Menu Toggle Button -->
                 <button class="navbar-toggle" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
                     <div class="lines">
@@ -40,18 +40,17 @@
                         <span></span>
                     </div>
                 </button>
+                @endif
 
             </div>
 
+            @if (!request()->isCustomer)
             <ul class="topbar-menu d-flex align-items-center gap-3">
                 <!-- <li class="d-none d-sm-inline-block">
                     <div class="nav-link" id="light-dark-mode">
                         <i class="ri-moon-line fs-22"></i>
                     </div>
                 </li> -->
-                @if (!request()->isGuest)
-                  
-
                 <li class="dropdown">
                     <a class="nav-link dropdown-toggle arrow-none nav-user" data-bs-toggle="dropdown" href="#" role="button"
                         aria-haspopup="false" aria-expanded="false">
@@ -60,7 +59,7 @@
                         </span>
                         <span class="d-lg-block d-none">
                             <h5 class="my-0 fw-normal">
-                                {{\Auth::guard('pengguna')->user()->nama}}
+                                {{\Auth::guard()->user()->name}}
                                 <i
                                     class="ri-arrow-down-s-line d-none d-sm-inline-block align-middle"></i></h5>
                         </span>
@@ -68,7 +67,7 @@
                     <div class="dropdown-menu dropdown-menu-end dropdown-menu-animated profile-dropdown">
                         <!-- item-->
                         <div class=" dropdown-header noti-title">
-                            <h6 class="text-overflow m-0">Welcome !</h6>
+                            <h6 class="text-overflow m-0">Welcome  {{\Auth::guard()->user()->name}}!</h6>
                         </div>
 
                         <!-- item-->
@@ -84,8 +83,8 @@
                         </a>
                     </div>
                 </li>
-                @endif
             </ul>
+            @endif
         </div>
     </div>
     <!-- ========== Topbar End ========== -->
@@ -120,21 +119,21 @@
         <div class="h-100" id="leftside-menu-container" data-simplebar>
             <!--- Sidemenu -->
             <ul class="side-nav">
-                @if (Auth::guard('pengguna')->check())
-                    @if (Auth::guard('pengguna')->user()->jabatan == 'admin')
+                @if (Auth::guard()->check())
+                    @if (Auth::guard()->user()->role == 'admin')
                         @include('web.layout.menu_admin')
-                    @elseif (Auth::guard('pengguna')->user()->jabatan == 'injector')
+                    @elseif (Auth::guard()->user()->role == 'injector')
                         @include('web.layout.menu_injector')
-                    @elseif (Auth::guard('pengguna')->user()->jabatan == 'kasir')
-                        @if(request('isGuest'))
-                            @include('web.layout.menu_guest')
+                    @elseif (Auth::guard()->user()->role == 'kasir')
+                        @if(request('isCustomer'))
+                            @include('web.layout.menu_customer')
                         @else
                             @include('web.layout.menu_cashier')
                         @endif
                     @endif
                     
                 @else
-                    @include('web.layout.menu_guest')
+                    @include('web.layout.menu_customer')
                 @endif
             </ul>
             <!--- End Sidemenu -->

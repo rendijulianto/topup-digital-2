@@ -19,9 +19,9 @@
                             <div class="carousel-inner">
                                 @foreach ($banners as $key => $banner)
                                 <div class="carousel-item active" data-bs-interval="2000">
-                                    <img src="{{asset('banners/'.$banner->gambar)}}"
+                                    <img src="{{asset('banners/'.$banner->image)}}"
                                     style="max-height: 250px"
-                                    class="img-fluid d-block w-100" alt='{{$banner->judul}}'>
+                                    class="img-fluid d-block w-100" alt='{{$banner->title}}'>
                                 </div>
                                 @endforeach
                                
@@ -75,7 +75,7 @@
     <div class="col-lg-12">
         <div class="row">
             <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'pulsa'])}}?isGuest={{request()->isGuest}}"
+                <a href="{{route('topup.create', ['category' => 'pulsa'])}}?isCustomer={{request()->isCustomer}}"
                     >
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
@@ -86,7 +86,7 @@
                 </a>
             </div>
             <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'e-money'])}}?isGuest={{request()->isGuest}}">
+                <a href="{{route('topup.create', ['category' => 'e-money'])}}?isCustomer={{request()->isCustomer}}">
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
                             <i class="ri-wallet-3-line fs-24 text-success"></i>
@@ -96,7 +96,7 @@
                 </a>
             </div>
             <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'pln'])}}?isGuest={{request()->isGuest}}">
+                <a href="{{route('topup.create', ['category' => 'pln'])}}?isCustomer={{request()->isCustomer}}">
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
                             <i class="ri-wireless-charging-line fs-24 text-primary"></i>
@@ -106,37 +106,27 @@
                 </a>
             </div>
             <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'data'])}}?isGuest={{request()->isGuest}}">
+                <a href="{{route('topup.create', ['category' => 'data'])}}?isCustomer={{request()->isCustomer}}">
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
                             <i class="ri-smartphone-line fs-24 text-info"></i>
-                            <h4 class="mt-2"> Paket Data Internet </h4>
+                            <h4 class="mt-2"> Paket Data </h4>
                         </div>
                     </div>
                 </a>
             </div>
             <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'Paket SMS & Telpon'])}}?isGuest={{request()->isGuest}}">
-                    <div class="card kategori">
-                        <div class="card-body d-flex flex-column align-items-center">
-                            <i class="ri-phone-line fs-24 text-primary"></i>
-                            <h4 class="mt-2"> Pulsa Sms & Telepon </h4>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-lg-3">
-                <a href="{{route('topup.create', ['category' => 'masa aktif'])}}?isGuest={{request()->isGuest}}">
+                <a href="{{route('topup.create', ['category' => 'masa aktif'])}}?isCustomer={{request()->isCustomer}}">
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
                             <i class="ri-health-book-line fs-24 text-primary"></i>
-                            <h4 class="mt-2"> Tambah Masa Aktif </h4>
+                            <h4 class="mt-2"> Masa Aktif </h4>
                         </div>
                     </div>
                 </a>
             </div>
             <div class="col-lg-3">
-                <a href="{{route('voucher')}}?isGuest={{request()->isGuest}}">
+                <a href="{{route('voucher')}}?isCustomer={{request()->isCustomer}}">
                     <div class="card kategori">
                         <div class="card-body d-flex flex-column align-items-center">
                             <i class="ri-ticket-line fs-24 text-primary"></i>
@@ -155,7 +145,7 @@
 <script>
       function getBestseller(event) {
         $.ajax({
-            url: `{{route('api.products.best-seller')}}?jumlah=5`,
+            url: `{{route('api.products.best-seller')}}?quantity=5`,
             method: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -163,7 +153,7 @@
                 response.data.forEach((voucher, index) => {
                     $('#produk-best-seller').append(`
                         <tr>
-                            <td>${voucher.nama}</td>
+                            <td>${voucher.name}</td>
                         </tr>
                     `);
                 });

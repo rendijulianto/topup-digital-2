@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">
-                <i class="fa fa-chart-line"></i> Log Aktivitas
+                <i class="fa fa-chart-line"></i> Daftar Log Aktivitas
 
                 </h4>
             </div>
@@ -54,8 +54,8 @@
                                     @forelse ($logs as $log)
                                        <tr>
                                             <td>{{$logs->firstItem() + $loop->index}}</td>
-                                            <td>{{$log->pengguna->nama}}</td>
-                                            <td>{{$log->keterangan}}</td>
+                                            <td>{{$log->user->name}}</td>
+                                            <td>{{$log->note}}</td>
                                             <td>{{$log->ip}}</td>
                                             <td>{{$log->created_at->format('d-m-Y H:i')}}</td>
                                         </tr>

@@ -4,31 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-class Produk extends Model
+class Product extends Model
 {
     use HasFactory;
-    protected $table = 'produk';
+    protected $table = 'products';
 
     protected $fillable = [
-        'nama',
-        'kategori_id',
-        'tipe_id',
+        'name',
+        'category_id',
+        'type_id',
         'brand_id',
-        'harga',
-        'deskripsi',
+        'price',
+        'description',
     ];
 
     protected $appends = [
         'status'
     ];
-
-    public function scopeDisruption($query)
-    {
-        return $query->whereDoesntHave('supplier_produk', function ($query) {
-            $query->where('status', 1);
-        });        
-    }
 
     public function scopeCategory($query, $category)
     {
@@ -36,8 +28,19 @@ class Produk extends Model
             return $query;
         }
 
-        return $query->whereHas('kategori', function ($query) use ($category) {
-            $query->where('nama', $category)->orWhere('id', $category);
+        return $query->whereHas('category', function ($query) use ($category) {
+            $query->where('name', $category)->orWhere('id', $category);
+        });
+    }
+
+    public function scopeCategories($query, $category)
+    {
+        if ($category == 'all' || $category == null) {
+            return $query;
+        }
+
+        return $query->whereHas('category', function ($query) use ($category) {
+            $query->where('name', $category)->orWhere('id', $category);
         });
     }
 
@@ -47,7 +50,7 @@ class Produk extends Model
             return $query;
         }
         return $query->whereHas('brand', function ($query) use ($brand) {
-            $query->where('nama', $brand)->orWhere('id', $brand);
+            $query->where('name', $brand)->orWhere('id', $brand);
         });
     }
 
@@ -57,24 +60,24 @@ class Produk extends Model
             return $query;
         }
 
-        return $query->whereHas('tipe', function ($query) use ($type) {
-            $query->where('nama', $type)->orWhere('id', $type);
+        return $query->whereHas('type', function ($query) use ($type) {
+            $query->where('name', $type)->orWhere('id', $type);
         });
     }
 
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
-            $query->where('nama', 'like', '%' . $request->search . '%')
-                ->orWhere('deskripsi', 'like', '%' . $request->search . '%')
-                ->orWhereHas('kategori', function ($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%')
+                ->orWhereHas('category', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
                 })
                 ->orWhereHas('brand', function ($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%');
+                    $q->where('name', 'like', '%' . $request->search . '%');
                 })
-                ->orWhereHas('tipe', function ($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%');
+                ->orWhereHas('type', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
                 });
         }
 
@@ -82,23 +85,23 @@ class Produk extends Model
             $query->where('brand_id', $request->brand);
         }
 
-        if ($request->kategori && $request->kategori != 'Semua') {
-            $query->where('kategori_id', $request->kategori);
+        if ($request->category && $request->category != 'Semua') {
+            $query->where('category_id', $request->category);
         }
 
-        if ($request->tipe && $request->tipe != 'Semua') {
-            $query->where('tipe_id', $request->tipe);
+        if ($request->type && $request->type != 'Semua') {
+            $query->where('type_id', $request->type);
         }
 
         if ($request->supplier && $request->supplier != 'Semua') {
-            $query->whereHas('supplier_produk', function ($query) use ($request) {
+            $query->whereHas('product_suppliers', function ($query) use ($request) {
                 $query->where('supplier_id', $request->supplier);
             });
         }
 
         if ($request->status && $request->status != 'Semua' || $request->status == '0') {
             if ($request->status == '0') {
-                $query->whereDoesntHave('supplier_produk', function ($query) {
+                $query->whereDoesntHave('product_suppliers', function ($query) {
                     $query->where('status', 1);
                 });
             }
@@ -113,7 +116,7 @@ class Produk extends Model
            
             whereHas('topup', function ($query) use ($request) {
                 
-                $query->whereBetween('tgl_transaksi', [$request->start . ' 00:00:00', $request->end . ' 23:59:59'])
+                $query->whereBetween('transacted_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59'])
                 ->where('status', 'sukses');
             });
         }
@@ -127,14 +130,14 @@ class Produk extends Model
 
 
     // relationship
-    public function kategori()
+    public function category()
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function tipe()
+    public function type()
     {
-        return $this->belongsTo(Tipe::class);
+        return $this->belongsTo(Type::class);
     }
 
     public function brand()
@@ -143,45 +146,45 @@ class Produk extends Model
     }
 
 
-    public function supplier_produk()
+    public function product_suppliers()
     {
-        return $this->hasMany(SupplierProduk::class, 'produk_id');
+        return $this->hasMany(ProductSupplier::class, 'product_id');
     }
 
     public function topup()
     {
-        return $this->hasMany(Topup::class, 'produk_id');
+        return $this->hasMany(Topup::class, 'product_id');
     }
 
     public function getStatusAttribute()
     {
         $status = true;
-        if ($this->supplier_produk->where('status', 1)->count() == 0) {
+        if ($this->product_suppliers->where('status', 1)->count() == 0) {
             $status = false;
         }
-        unset($this->supplier_produk);
+        unset($this->product_suppliers);
         return $status;
     }
 
-    public function getHargaTermahalAttribute()
+    public function getMaxPriceAttribute()
     {
-        return $this->supplier_produk->max('harga');
+        return $this->product_suppliers->max('price');
     }
    
     
     public function getSupplier()
     {
-        $suppliers = $this->supplier_produk->filter(function ($supplier) {
+        $suppliers = $this->product_suppliers->filter(function ($supplier) {
             return $supplier->status == 1;
-        })->sortBy('harga');
+        })->sortBy('price');
         
         $supplierArray = $suppliers->map(function ($supplier) {
             $totalTopup = $supplier->topup_api->count();
             $totalSuccessTopup = $supplier->topup_api->where('status', 'sukses')->count();
             return [
                 'id' => $supplier->id,
-                'name' => strtoupper($supplier->supplier->nama),
-                'price' => number_format($supplier->harga, 0, ',', '.'),
+                'name' => strtoupper($supplier->supplier->name),
+                'price' => number_format($supplier->price, 0, ',', '.'),
                 'total_topup' => $totalTopup,
                 'total_berhasil' => $totalSuccessTopup,
                 'persentase_berhasil' => round($totalTopup == 0 ? 0 : ($totalSuccessTopup / $totalTopup) * 100),

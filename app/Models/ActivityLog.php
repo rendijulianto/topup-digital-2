@@ -5,31 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class LogAktivitas extends Model
+class ActivityLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'log_aktivitas';
+    protected $table = 'activity_logs';
 
     protected $fillable = [
-        'pengguna_id',
+        'user_id',
         'ip',
-        'keterangan',
+        'note',
         'user_agent',
     ];
 
     public function scopeSearch($query, $request)
     {
         if ($request->search) {
-            $query->where('keterangan', 'like', '%' . $request->search . '%');
+            $query->where('note', 'like', '%' . $request->search . '%');
         }
 
         return $query;
     }
 
-    public function pengguna()
+    public function user()
     {
-        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
 }

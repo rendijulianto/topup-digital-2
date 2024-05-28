@@ -23,34 +23,34 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="nama" class="form-label">Nama Toko</label>
-                            <input type="text" class="form-control" id="nama" name="nama" value="{{$website->nama}}" required>
+                            <label for="name" class="form-label">Nama Toko</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{$website->name}}" required>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="alamat" class="form-label">Alamat</label>
-                            <textarea class="form-control" id="alamat" name="alamat" rows="3" required>{{$website->alamat}}</textarea>
+                            <label for="address" class="form-label">Alamat</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" required>{{$website->address}}</textarea>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                         <div class="mb-3">
-                            <label for="nomor_telepon" class="form-label">No. Telp</label>
-                            <input type="text" class="form-control" id="nomor_telepon" name="nomor_telepon" value="{{$website->nomor_telepon}}" required>
+                            <label for="telp" class="form-label">No. Telp</label>
+                            <input type="text" class="form-control" id="telp" name="telp" value="{{$website->telp}}" required>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="logo_website" class="form-label">Logo Sidebar</label>
                             <input class="form-control" type="file" id="logo_website" name="logo_website">
-                            <img src="{{asset('storage/'.$website->logo_website)}}" alt="logo" class="img-thumbnail mt-2" style="width: 100px">
+                            <img src="{{asset('websites/'.$website->logo_website)}}" alt="logo" class="img-thumbnail mt-2" style="width: 100px">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="logo_printer" class="form-label">Logo Printer</label>
-                            <input class="form-control" type="file" id="logo_printer" name="logo_printer">
-                            <img src="{{asset('storage/'.$website->logo_printer)}}" alt="logo printer" class="img-thumbnail mt-2" style="width: 100px">
+                            <label for="logo_print" class="form-label">Logo Printer</label>
+                            <input class="form-control" type="file" id="logo_print" name="logo_print">
+                            <img src="{{asset('websites/'.$website->logo_print)}}" alt="logo printer" class="img-thumbnail mt-2" style="width: 100px">
                         </div>
                     </div>
                 </div>

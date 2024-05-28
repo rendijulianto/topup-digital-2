@@ -18535,8 +18535,7 @@ div.dataTables_scrollBody>table>:not(:first-child){
 
 .kategori:hover {
     cursor: pointer;
-    background-color: #d03f3f;
-    color: #fff;
+    border: 1px solid #d03f3f;
 }
 
 /* ganti kelas color icon jika dihover kategori */

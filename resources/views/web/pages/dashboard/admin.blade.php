@@ -102,7 +102,7 @@
                             @foreach($products as $key => $product)
                             <tr>
                                 <td>{{$key + 1}} </td>
-                                <td>{{$product->nama}}</td>
+                                <td>{{$product->name}}</td>
                                 <td>{{$product->topup_count}}</td>
                             </tr>
                             @endforeach

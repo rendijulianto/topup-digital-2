@@ -1,10 +1,11 @@
 <head>
     <meta charset="utf-8" />
     <title>
-        {{config('app.name')}} - @yield('title')
+        {{$websiteData->name}} - @yield('title')
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Toko indah jaya" name="description" />
+    <meta content="Aplikasi Top up {{$websiteData->name}} - @yield('title')"
+    name="description" />
     <meta content="Rendi Julianto" name="author" />
 
     <!-- App favicon -->

@@ -15,12 +15,12 @@ class TopupVoucher extends Model
     // fillable attrib
     protected $fillable = [
         'topup_id',
-        'tgl_kadaluarsa',
+        'expired_at',
         'status',
     ];
 
     protected $casts = [
-        'tgl_kadaluarsa' => 'datetime',
+        'expired_at' => 'datetime',
     ];
 
     public $timestamps = false;

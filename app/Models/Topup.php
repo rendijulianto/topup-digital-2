@@ -11,33 +11,33 @@ class Topup extends Model
     use HasFactory;
 
     // table name
-    protected $table = 'topup';
+    protected $table = 'topups';
 
     // fillable attrib
     protected $fillable = [
-        'produk_id',
-        'kategori_id',
-        'tipe_id',
+        'product_id',
+        'category_id',
+        'type_id',
         'brand_id',
-        'kasir_id',
-        'nomor',
-        'keterangan',
-        'harga_beli',
-        'harga_jual',
+        'cashier_id',
+        'target',
+        'note',
+        'price_buy',
+        'price_sell',
         'whatsapp',
         'status',
-        'tipe',
-        'tgl_transaksi',
+        'type',
+        'transacted_at',
     ];
     
     public function getCustomerNameAttribute()
     {
        try {
             $customerName = '';
-            if($this->tipe == "e_wallet") {
-                $customerName = $this->e_wallet->nama_pelanggan;
-            } else if ($this->tipe == "token_listrik") {
-                $customerName = $this->token_listrik->nama_pelanggan;
+            if($this->type == "e_wallet") {
+                $customerName = $this->e_wallet->customer_name;
+            } else if ($this->type == "token_listrik") {
+                $customerName = $this->token_listrik->customer_name;
             }
             return $customerName;
        } catch (\Throwable $th) {
@@ -51,39 +51,39 @@ class Topup extends Model
         $message = "Halo, pelanggan *".config('app.name')."*.
 Berikut adalah rincian topup Anda:
 No: ".$this->id."
-Nomor: ".$this->nomor."
-Produk: ".$this->produk->nama."
-Harga: Rp ".number_format($this->harga_jual, 0, ',', '.')."
+Nomor: ".$this->target."
+Produk: ".$this->product->name."
+Harga: Rp ".number_format($this->price_sell, 0, ',', '.')."
 Status: ".strtoupper($this->status)."
-Waktu: ".$this->tgl_transaksi."
-Keterangan: ".$this->keterangan."
+Waktu: ".$this->transacted_at."
+Keterangan: ".$this->note."
 Terima kasih telah berbelanja di *".config('app.name')."*.";
 
-        if($this->tipe == "e_wallet") {
+        if($this->type == "e_wallet") {
             $message = "Hallo, Pelanggan *".config('app.name')."*.
 Berikut adalah rincian topup Anda:
 No: ".$this->id."
-Nomor: ".$this->nomor."
-Nama Pelanggan: ".$this->e_wallet->nomor_pelanggan."
-Produk: ".$this->produk->nama."
-Harga: Rp ".number_format($this->harga_jual, 0, ',', '.')."
+Nomor: ".$this->target."
+Nama Pelanggan: ".$this->e_wallet->customer_name."
+Produk: ".$this->product->name."
+Harga: Rp ".number_format($this->price_sell, 0, ',', '.')."
 Status: ".strtoupper($this->status)."
-Waktu: ".$this->tgl_transaksi."
-Keterangan: ".$this->keterangan."
+Waktu: ".$this->transacted_at."
+Keterangan: ".$this->note."
 Terima kasih telah berbelanja di *".config('app.name')."*.";
 
-        } else if ($this->tipe == "token_listrik") {
+        } else if ($this->type == "token_listrik") {
             $message = "Hallo, Pelanggan *".config('app.name')."*.
 Berikut adalah rincian topup Anda:
 No: ".$this->id."
-Nomor: ".$this->nomor."
-Nama Pelanggan: ".$this->token_listrik->nama_pelanggan."
+Nomor: ".$this->target."
+Nama Pelanggan: ".$this->token_listrik->customer_name."
 Segmen Power: ".$this->token_listrik->segment_power."
-Produk: ".$this->produk->nama."
-Harga: Rp ".number_format($this->harga_jual, 0, ',', '.')."
+Produk: ".$this->product->name."
+Harga: Rp ".number_format($this->price_sell, 0, ',', '.')."
 Status: ".strtoupper($this->status)."
-Waktu: ".$this->tgl_transaksi."
-Nomor Token : ".Str::before($this->keterangan, "/")."
+Waktu: ".$this->transacted_at."
+Nomor Token : ".Str::before($this->note, "/")."
 Terima kasih telah berbelanja di *".config('app.name')."*.";
         }
         return $message;
@@ -95,37 +95,37 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
          if ($request->start && $request->end) {
               if($request->filter_date == "created_at") {
                   $query->whereBetween('created_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
-              } else if ($request->filter_date == "tgl_kadaluwarsa") {
+              } else if ($request->filter_date == "expired_at") {
                   $query->whereHas('voucher', function ($query) use ($request) {
-                      $query->whereBetween('tgl_kadaluarsa', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
+                      $query->whereBetween('expired_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
                   });
               } else {
-                  $query->whereBetween('tgl_transaksi', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
+                  $query->whereBetween('transacted_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
               }
           }
-          //  kategori
-          if ($request->kategori and $request->kategori != 'Semua') {
-              $query->where('kategori_id', $request->kategori);
+          //  category
+          if ($request->category and $request->category != 'Semua') {
+              $query->where('category_id', $request->category);
           }
-          // produk
-          if ($request->produk and $request->produk != 'Semua') {
-              $query->where('produk_id', $request->produk);
+          // product
+          if ($request->product and $request->product != 'Semua') {
+              $query->where('product_id', $request->product);
           }
           // brand
           if ($request->brand and $request->brand != 'Semua') {
               $query->where('brand_id', $request->brand);
           }
-          // tipe
-          if ($request->tipe and $request->tipe != 'Semua') {
-              $query->where('tipe_id', $request->tipe);
+          // type
+          if ($request->type and $request->type != 'Semua') {
+              $query->where('type_id', $request->type);
           }
           // status
           if ($request->status and $request->status != 'Semua') {
               $query->where('status', $request->status);
           }
-          // kasir =
-          if ($request->kasir and $request->kasir != 'Semua') {
-              $query->where('kasir_id', $request->kasir);
+          // cashier =
+          if ($request->cashier and $request->cashier != 'Semua') {
+              $query->where('cashier_id', $request->cashier);
           }
           // supplier
           if ($request->supplier and $request->supplier != 'Semua') {
@@ -146,15 +146,15 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
               });
           }
           if ($request->search) {
-              $query->where('nomor', 'like', '%' . $request->search . '%')->
-                  orWhereHas('produk', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
-              })->orWhereHas('kasir', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
+              $query->where('target', 'like', '%' . $request->search . '%')->
+                  orWhereHas('product', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
+              })->orWhereHas('cashier', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
               })->orWhereHas('brand', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
-              })->orWhereHas('kategori', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
+                  $query->where('name', 'like', '%' . $request->search . '%');
+              })->orWhereHas('category', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
               })->orWhereHas('topup_api', function ($query) use ($request) {
                   $query->where('supplier_id', $request->search);
               });
@@ -171,23 +171,23 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
               $query->whereBetween('created_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59']);
              
           }
-          if ($request->kategori and $request->kategori != 'Semua') {
-              $query->where('kategori_id', $request->kategori);
+          if ($request->category and $request->category != 'Semua') {
+              $query->where('category_id', $request->category);
           }
-          if ($request->produk and $request->produk != 'Semua') {
-              $query->where('produk_id', $request->produk);
+          if ($request->product and $request->product != 'Semua') {
+              $query->where('product_id', $request->product);
           }
           if ($request->brand and $request->brand != 'Semua') {
               $query->where('brand_id', $request->brand);
           }
-          if ($request->tipe and $request->tipe != 'Semua') {
-              $query->where('tipe_id', $request->tipe);
+          if ($request->type and $request->type != 'Semua') {
+              $query->where('type_id', $request->type);
           }
           if ($request->status and $request->status != 'Semua') {
               $query->where('status', $request->status);
           }
-          if ($request->kasir and $request->kasir != 'Semua') {
-              $query->where('kasir_id', $request->kasir);
+          if ($request->cashier and $request->cashier != 'Semua') {
+              $query->where('cashier_id', $request->cashier);
           }
           if ($request->supplier and $request->supplier != 'Semua') {
               $query->whereHas('topup_api', function ($query) use ($request) {
@@ -201,22 +201,22 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
           if ($request->aktivator and $request->aktivator != 'Semua') {
               $query->whereHas('topup_api', function ($query) use ($request) {
                   $query->where([
-                      ['pengguna_id', $request->aktivator],
+                      ['user_id', $request->aktivator],
                       ['status', 'sukses']
                   ]);
               });
           }
           // search
           if ($request->search) {
-              $query->where('nomor', 'like', '%' . $request->search . '%')->
-                  orWhereHas('produk', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
-              })->orWhereHas('kasir', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
+              $query->where('target', 'like', '%' . $request->search . '%')->
+                  orWhereHas('product', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
+              })->orWhereHas('cashier', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
               })->orWhereHas('brand', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
-              })->orWhereHas('kategori', function ($query) use ($request) {
-                  $query->where('nama', 'like', '%' . $request->search . '%');
+                  $query->where('name', 'like', '%' . $request->search . '%');
+              })->orWhereHas('category', function ($query) use ($request) {
+                  $query->where('name', 'like', '%' . $request->search . '%');
               })->orWhereHas('topup_api', function ($query) use ($request) {
                   $query->where('supplier_id', $request->search);
               });
@@ -227,14 +227,15 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
       public function scopeGetProductVoucher($query, $request)
       {
           return $query
-          ->whereHas('produk', function ($query) use ($request) {
+          ->whereHas('product', function ($query) use ($request) {
               $query->brand($request->brand);
           })
           ->whereHas('voucher', function ($query) {
-              $query->where('tgl_kadaluarsa', '>', now());
+              $query->where('expired_at', '>', now());
           })
-          ->where('tgl_transaksi', '=', null)
-          ->orderBy('harga_jual', 'desc');
+          ->where('transacted_at', '=', null)
+          ->where('status', 'sukses')
+          ->orderBy('price_sell', 'desc');
       }  
 
 
@@ -250,25 +251,25 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
         
         while ($start <= $end) {
             $date = $start->format('Y-m-d');
-            $topupSukses = Topup::whereDate('tgl_transaksi', $date)
+            $topupSukses = Topup::whereDate('transacted_at', $date)
                 ->where('status', 'sukses');
-            $topupPending = Topup::whereDate('tgl_transaksi', $date)
+            $topupPending = Topup::whereDate('transacted_at', $date)
                 ->where('status', 'pending');
-            $topupGagal = Topup::whereDate('tgl_transaksi', $date)
+            $topupGagal = Topup::whereDate('transacted_at', $date)
                 ->where('status', 'gagal');
 
-            if ($request->kasir_id) {
-                $topupSukses->where('kasir_id', $request->kasir_id);
-                $topupPending->where('kasir_id', $request->kasir_id);
-                $topupGagal->where('kasir_id', $request->kasir_id);
+            if ($request->cashier_id) {
+                $topupSukses->where('cashier_id', $request->cashier_id);
+                $topupPending->where('cashier_id', $request->cashier_id);
+                $topupGagal->where('cashier_id', $request->cashier_id);
             }
 
             $report[$date] = [
-                'sukses' => $topupSukses->sum('harga_jual'),
+                'sukses' => $topupSukses->sum('price_sell'),
                 'total_sukses' => $topupSukses->count(),
-                'pending' => $topupPending->sum('harga_jual'),
+                'pending' => $topupPending->sum('price_sell'),
                 'total_pending' => $topupPending->count(),
-                'gagal' => $topupGagal->sum('harga_jual'),
+                'gagal' => $topupGagal->sum('price_sell'),
                 'total_gagal' => $topupGagal->count(),
             ];
             $start->addDay();
@@ -295,35 +296,35 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
             $date = $start->format('Y-m-d');
         
             $topupSuksesQuery = Topup::whereDate('created_at', $date)
-                ->where('tipe', 'voucher')
+                ->where('type', 'voucher')
                 ->where('status', 'sukses');
         
             $topupPendingQuery = Topup::whereDate('created_at', $date)
-                ->where('tipe', 'voucher')
+                ->where('type', 'voucher')
                 ->where('status', 'pending');
         
             $topupGagalQuery = Topup::whereDate('created_at', $date)
-                ->where('tipe', 'voucher')
+                ->where('type', 'voucher')
                 ->where('status', 'gagal');
         
             if ($request->user_id) {
                 $topupSuksesQuery->whereHas('topup_api', function ($query) use ($request) {
-                    $query->where('pengguna_id', $request->user_id);
+                    $query->where('user_id', $request->user_id);
                 });
                 $topupPendingQuery->whereHas('topup_api', function ($query) use ($request) {
-                    $query->where('pengguna_id', $request->user_id);
+                    $query->where('user_id', $request->user_id);
                 });
                 $topupGagalQuery->whereHas('topup_api', function ($query) use ($request) {
-                    $query->where('pengguna_id', $request->user_id);
+                    $query->where('user_id', $request->user_id);
                 });
             }
         
             $report[$date] = [
-                'sukses' => $topupSuksesQuery->sum('harga_beli'),
+                'sukses' => $topupSuksesQuery->sum('price_buy'),
                 'total_sukses' => $topupSuksesQuery->count(),
-                'pending' => $topupPendingQuery->sum('harga_beli'),
+                'pending' => $topupPendingQuery->sum('price_buy'),
                 'total_pending' => $topupPendingQuery->count(),
-                'gagal' => $topupGagalQuery->sum('harga_beli'),
+                'gagal' => $topupGagalQuery->sum('price_buy'),
                 'total_gagal' => $topupGagalQuery->count(),
             ];
         
@@ -337,16 +338,16 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
     public function scopeGetReportAdmin($query, $request)
     {
           // Common query base
-          $queryBase = Topup::whereBetween('tgl_transaksi', [$request->start . ' 00:00:00', $request->end . ' 23:59:59'])
-          ->whereIn('status', ['pending', 'sukses'])	
-          ->where('tgl_transaksi', '!=', null);
+          $queryBase = Topup::whereBetween('transacted_at', [$request->start . ' 00:00:00', $request->end . ' 23:59:59'])
+          ->whereIn('status', [ 'sukses'])	
+          ->where('transacted_at', '!=', null);
 
       // Calculate total top-up sum
-      $totalTopupSum = (clone $queryBase)->sum('harga_jual');
+      $totalTopupSum = (clone $queryBase)->sum('price_sell');
 
       // Calculate profit
-      $totalHargaJual = (clone $queryBase)->sum('harga_jual');
-      $totalHargaBeli = (clone $queryBase)->sum('harga_beli');
+      $totalHargaJual = (clone $queryBase)->sum('price_sell');
+      $totalHargaBeli = (clone $queryBase)->sum('price_buy');
       $profit = $totalHargaJual - $totalHargaBeli;
 
       // Calculate count of top-ups
@@ -360,15 +361,15 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
     }
 
     // relationship
-    public function produk()
+    public function product()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->belongsTo(Product::class);
     }
 
-    // kategori
-    public function kategori()
+    // category
+    public function category()
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function brand()
@@ -376,14 +377,14 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
         return $this->belongsTo(Brand::class);
     }
 
-    public function kasir()
+    public function cashier()
     {
-        return $this->belongsTo(Pengguna::class, 'kasir_id', 'id');
+        return $this->belongsTo(User::class, 'cashier_id', 'id');
     }
 
-    public function tipe_produk()
+    public function type_product()
     {
-        return $this->belongsTo(Tipe::class, 'tipe_id', 'id');
+        return $this->belongsTo(Type::class, 'type_id', 'id');
     }
 
     // topup_api
@@ -413,11 +414,11 @@ Terima kasih telah berbelanja di *".config('app.name')."*.";
     // supplier
     public function getSupplierNameAttribute()
     {
-        $nama = '';
+        $name = '';
         if($this->topup_api->where('status', 'sukses')->first()) {
-            $nama = $this->topup_api->where('status', 'sukses')->first()->supplier->nama;
+            $name = $this->topup_api->where('status', 'sukses')->first()->supplier->name;
         }
-        return $nama;
+        return $name;
     }
  
 }

@@ -20,10 +20,10 @@ class Role
         //     return $next($request);
         // }
 
-        if (Auth::guard('pengguna')->check()) {
+        if (Auth::guard()->check()) {
             // Periksa apakah peran pengguna sesuai dengan salah satu dari peran yang diberikan
             foreach ($roles as $role) {
-                if (Auth::guard('pengguna')->user()->jabatan == $role) {
+                if (Auth::guard()->user()->role == $role) {
                     return $next($request);
                 }
             }

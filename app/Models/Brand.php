@@ -9,10 +9,10 @@ class Brand extends Model
 {
     use HasFactory;
 
-    protected $table = 'brand';
+    protected $table = 'brands';
 
     protected $fillable = [
-        'nama',
+        'name',
         'logo',
     ];
 
@@ -23,8 +23,8 @@ class Brand extends Model
     public function scopeCategory($query, $category)
     {
         return $query->whereHas('produk', function ($query) use ($category) {
-            $query->whereHas('kategori', function ($query) use ($category) {
-                $query->where('nama', $category)->orWhere('id', $category);
+            $query->whereHas('category', function ($query) use ($category) {
+                $query->where('name', $category)->orWhere('id', $category);
             });
         });
     }
@@ -32,13 +32,13 @@ class Brand extends Model
     public function scopeSearch($query, $request)
     {
         return $query->when($request->search, function ($query) use ($request) {
-            return $query->where('nama', 'like', '%' . $request->search . '%');
+            return $query->where('name', 'like', '%' . $request->search . '%');
         });
     }
 
     public function produk()
     {
-        return $this->hasMany(Produk::class, 'brand_id', 'id');
+        return $this->hasMany(Product::class, 'brand_id', 'id');
     }
 
     public function topup()

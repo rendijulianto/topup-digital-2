@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <title>
-        {{ $websiteData->nama }} - Lupa Password
+        {{ $websiteData->name }} - Lupa Password
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Aplikasi Top up Digital" name="description" />
@@ -60,12 +60,14 @@
                                             });
                                         </script>
                                         @elseif(session('success'))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            <i class="mdi mdi-check-all me-2"></i>
-                                            {{ session('success') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
-                                        </div>
+                                            <script>
+                                                Swal.fire({
+                                                    title: 'Berhasil!',
+                                                    text: '{{ session('success') }}',
+                                                    icon: 'success',
+                                                    confirmButtonText: 'Close'
+                                                });
+                                            </script>
                                         @endif
                                         <!-- form -->
                                         <form action="{{route('postForgotPassword')}}" method="POST">

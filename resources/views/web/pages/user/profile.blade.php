@@ -19,8 +19,8 @@
                 @method('put')
                 @csrf
                 <div class="mb-3">
-                    <label for="nama" class="form-label">Nama</label>
-                    <input type="text" class="form-control" id="nama" name="nama" value="{{$user->nama}}" required>
+                    <label for="name" class="form-label">Nama</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{$user->name}}" required>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                 </div>
-                @if ($user->jabatan != 'admin')
+                @if ($user->role != 'admin')
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
@@ -90,7 +90,7 @@
                 method: method,
                 data: data,
                 success: function(response) {
-                    if (response.status == 'success') {
+                    if (response.status == true) {
                         Swal.fire({
                             title: 'Berhasil',
                             text: response.message,

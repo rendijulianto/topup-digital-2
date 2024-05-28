@@ -16,7 +16,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h4 class="card-title">Daftar Supplier Produk - {{$product->nama}}</h4>
+                <h4 class="card-title">Daftar Supplier Produk - {{$product->name}}</h4>
                 <div>
                 <button id="btnModalTambah" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> Tambah</button>
                     
@@ -46,12 +46,12 @@
                                             @forelse ($products as $supplierProduct)
                                                 <tr>
                                                     <td>{{$loop->iteration}}</td>
-                                                    <td>{{$supplierProduct->produk_sku_code}}</td>
-                                                    <td>Rp {{number_format($supplierProduct->harga, 0, ',', '.')}}</td>
+                                                    <td>{{$supplierProduct->product_sku_code}}</td>
+                                                    <td>Rp {{number_format($supplierProduct->price, 0, ',', '.')}}</td>
                                                     <td>{{$supplierProduct->multi ? 'Ya' : 'Tidak'}}</td>	
-                                                    <td>{{$supplierProduct->stok}}</td>
-                                                    <td>{{$supplierProduct->supplier->nama}}</td>
-                                                    <td>{{$supplierProduct->jam_tutup}} - {{$supplierProduct->jam_buka}}</td>
+                                                    <td>{{$supplierProduct->stock}}</td>
+                                                    <td>{{$supplierProduct->supplier->name}}</td>
+                                                    <td>{{$supplierProduct->start_cut_off}} - {{$supplierProduct->end_cut_off}}</td>
                                                     <td>
                                                        {{$supplierProduct->status ? 'Aktif' : 'Tidak Aktif'}}
                                                     </td>

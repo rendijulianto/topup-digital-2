@@ -230,7 +230,7 @@
                 url: "{{route('api.brands.category')}}",
                 type: "GET",
                 data: {
-                    kategori: 'Aktivasi Voucher'
+                    category: 'Aktivasi Voucher'
                 },
                 beforeSend: function(){
                 
@@ -240,8 +240,8 @@
                         $('#brand').html('');
                         $.each(response.data, function(index, brand){
                        
-                            let link = `{{route('voucher.brand', ['brand' => ':id'])}}?isGuest={{request()->isGuest}}`;
-                            link = link.replace(':id', brand.nama.toLowerCase().replace(' ', '-'));
+                            let link = `{{route('voucher.brand', ['brand' => ':id'])}}?isCustomer={{request()->isCustomer}}`;
+                            link = link.replace(':id', brand.name.toLowerCase().replace(' ', '-'));
                             $('#brand').append(`
                             <div class="col-lg-3">
                                 <a class="card" href="${link}">
@@ -250,7 +250,7 @@
                                             <img src="${brand.logo_url}"
                                             alt="" class="img-e-wallet">
                                         </div>
-                                        <label for="" class="mb-2">${brand.nama}</label>
+                                        <label for="" class="mb-2">${brand.name}</label>
                                         <div class="rounded w-100">
                                             <button class="btn btn-primary
                                             w-100"><i class="fa fa-ticket"></i> 

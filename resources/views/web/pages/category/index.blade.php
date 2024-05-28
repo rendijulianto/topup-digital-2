@@ -1,9 +1,4 @@
 @extends('web.layout.app')
-@section('style')
-<style>
-
-</style>
-@endsection
 @section('breadcrumb')
 <div class="row">
     <div class="col-12">
@@ -18,7 +13,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h4 class="card-title">Daftar Kategori</h4>
+                <h4 class="card-title"><i class="ri-list-check-2"></i> Daftar Kategori</h4>
                 <button id="btnModalTambah" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
             <div class="card-body">
@@ -52,7 +47,7 @@
                                             @forelse ($categories as $category)
                                             <tr>
                                                 <th>{{ ($loop->index + 1) + ($categories->currentPage() - 1) * $categories->perPage() }}</th>
-                                                <td>{{$category->nama}}</td>
+                                                <td>{{$category->name}}</td>
                                                 <td>
                                                 <a 
                                                 onclick="handleEdit({{$category->id}})"
@@ -123,7 +118,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" aria-label="Close">Batal</button>
-                <button type="submit" id="btnSubmitUbah" class="btn btn-success btn-sm">Simpan</button>
+                <button type="submit" id="btnSubmitUbah"
+                
+                class="btn btn-success btn-sm">Simpan</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -205,7 +202,7 @@
         });
     }
 
-    const handleEditSubmit = () => {
+    $('#btnSubmitUbah').on('click', function(e) {
         e.preventDefault();
         const url = $('#form_ubah form').attr('action');
         const method = $('#form_ubah form').attr('method');
@@ -248,7 +245,7 @@
                 }
             }
         });
-    }
+    });
     
     const handleDelete = (id) => {
         Swal.fire({

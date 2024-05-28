@@ -13,7 +13,7 @@ class TopupEWallet extends Model
 
     protected $fillable = [
         'topup_id',
-        'nama_pelanggan',
+        'customer_name',
     ];
     public $timestamps = false;
 }

@@ -21,8 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // $('#harga').mask('000.000.000', {reverse: true});
-       
+    
         Validator::extend('numeric_rupiah', function ($attribute, $value, $parameters, $validator) {
             return preg_match('/^[0-9]+(\.[0-9]{1,2})?$/', $value);
         });

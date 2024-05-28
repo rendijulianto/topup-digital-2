@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Banner;
-use App\Models\LogAktivitas;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 
@@ -36,36 +36,36 @@ class BannerController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'judul' => ['required', 'string', 'max:50', 'unique:banner,judul'],
-            'gambar' => ['required', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'],
+            'title' => ['required', 'string', 'max:50', 'unique:banners,title'],
+            'image' => ['required', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'],
         ], [
-            'judul.required' => 'Judul tidak boleh kosong!',
-            'judul.string' => 'Judul harus berupa string!',
-            'judul.max' => 'Judul maksimal 50 karakter!',
-            'judul.unique' => 'Judul sudah terdaftar!',
-            'gambar.required' => 'Gambar tidak boleh kosong!',
-            'gambar.image' => 'Gambar harus berupa gambar!',
-            'gambar.max' => 'Gambar maksimal 2MB!',
-            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau WEBP!',
+            'title.required' => 'Judul tidak boleh kosong!',
+            'title.string' => 'Judul harus berupa string!',
+            'title.max' => 'Judul maksimal 50 karakter!',
+            'title.unique' => 'Judul sudah terdaftar!',
+            'image.required' => 'Gambar tidak boleh kosong!',
+            'image.image' => 'Gambar harus berupa image!',
+            'image.max' => 'Gambar maksimal 2MB!',
+            'image.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau WEBP!',
 
         ]);
 
         try {
           
-            $imageName = time() . '.' . $request->gambar->extension();
-            $request->file('gambar')->move('banners', $imageName);
-            // $request->gambar->move(public_path('banners'), $imageName);
+            $imageName = time() . '.' . $request->image->extension();
+            $request->file('image')->move('banners', $imageName);
+            // $request->image->move(public_path('banners'), $imageName);
      
 
             Banner::create([
-                'judul' => $request->judul,
-                'gambar' => $imageName,
+                'title' => $request->title,
+                'image' => $imageName,
             ]);
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan banner baru: ' . $request->judul,
+                'note' => 'Menambahkan banner baru: ' . $request->title,
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
@@ -97,39 +97,39 @@ class BannerController extends Controller
     public function update(Request $request, Banner $banner)
     {
         $this->validate($request, [
-            'judul' => ['required', 'string', 'max:50', 'unique:banner,judul,' . $banner->id],
-            'gambar' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'],
+            'title' => ['required', 'string', 'max:50', 'unique:banners,title,' . $banner->id],
+            'image' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png,webp'],
         ], [
-            'judul.required' => 'Judul tidak boleh kosong!',
-            'judul.string' => 'Judul harus berupa string!',
-            'judul.max' => 'Judul maksimal 50 karakter!',
-            'judul.unique' => 'Judul sudah terdaftar!',
-            'gambar.image' => 'Gambar harus berupa gambar!',
-            'gambar.max' => 'Gambar maksimal 2MB!',
-            'gambar.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau WEBP!',
+            'title.required' => 'Judul tidak boleh kosong!',
+            'title.string' => 'Judul harus berupa string!',
+            'title.max' => 'Judul maksimal 50 karakter!',
+            'title.unique' => 'Judul sudah terdaftar!',
+            'image.image' => 'Gambar harus berupa image!',
+            'image.max' => 'Gambar maksimal 2MB!',
+            'image.mimes' => 'Gambar harus berformat JPG, JPEG, PNG, atau WEBP!',
         ]);
 
         try {
-            if ($request->hasFile('gambar')) {
-                if ($banner->gambar && file_exists(public_path("banners/{$banner->gambar}"))) {
-                    unlink(public_path("banners/{$banner->gambar}"));
+            if ($request->hasFile('image')) {
+                if ($banner->image && file_exists(public_path("banners/{$banner->image}"))) {
+                    unlink(public_path("banners/{$banner->image}"));
                 }
 
-                $imageName = time() . '.' . $request->gambar->extension();
-                $request->file('gambar')->move('banners', $imageName);
+                $imageName = time() . '.' . $request->image->extension();
+                $request->file('image')->move('banners', $imageName);
             } else {
-                $imageName = $banner->gambar;
+                $imageName = $banner->image;
             }
 
             $banner->update([
-                'judul' => $request->judul,
-                'gambar' => $imageName,
+                'title' => $request->title,
+                'image' => $imageName,
             ]);
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah banner: ' . $banner->judul,
+                'note' => 'Mengubah banner: ' . $banner->title,
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
@@ -157,10 +157,10 @@ class BannerController extends Controller
             $banner->update([
                 'status' => !$banner->status,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah status banner: ' . $banner->judul,
+                'note' => 'Mengubah status banner: ' . $banner->title,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -181,16 +181,16 @@ class BannerController extends Controller
     public function destroy(Request $request, Banner $banner)
     {
         try {
-            if ($banner->gambar && file_exists(public_path("banners/{$banner->gambar}"))) {
-                unlink(public_path("banners/{$banner->gambar}"));
+            if ($banner->image && file_exists(public_path("banners/{$banner->image}"))) {
+                unlink(public_path("banners/{$banner->image}"));
             }
 
             $banner->delete();
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menghapus banner: ' . $banner->judul,
+                'note' => 'Menghapus banner: ' . $banner->title,
                 'user_agent' => $request->header('User-Agent'),
             ]);
 

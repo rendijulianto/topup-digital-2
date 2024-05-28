@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Tipe, Prefix};
+use App\Models\{Type, Prefix};
 use Illuminate\Support\Str;
 class TypeController extends Controller
 {
@@ -23,7 +23,7 @@ class TypeController extends Controller
         
         $prefix = Str::substr($request->prefix, 0, 4);
 
-        $prefix = Prefix::where('nomor', $prefix)->first();
+        $prefix = Prefix::where('number', $prefix)->first();
 
         if (!$prefix) {
             return response()->json([
@@ -32,7 +32,7 @@ class TypeController extends Controller
             ], 404);
         }
 
-        $types = Tipe::brand($prefix->brand_id)->category($request->kategori)->get();
+        $types = Type::brand($prefix->brand_id)->category($request->category)->get();
         
         return response()->json([
             'status' => true,
@@ -50,13 +50,13 @@ class TypeController extends Controller
     public function getByCategoryBrand(Request $request)
     {
         $this->validate($request, [
-            'kategori_id' => 'required|exists:kategori,id',
-            'brand_id' => 'required|exists:brand,id'
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id'
         ]);
 
-        $types = Tipe::select('id', 'nama')
+        $types = Type::select('id', 'name')
         ->brand($request->brand_id)
-        ->category($request->kategori_id)->get();
+        ->category($request->category_id)->get();
 
         return response()->json([
             'status' => true,

@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SupplierProduk extends Model
+class ProductSupplier extends Model
 {
     use HasFactory;
-    protected $table = 'supplier_produk';
+    protected $table = 'product_suppliers';
     protected $fillable = [
         'supplier_id',
-        'produk_id',
-        'produk_sku_code',
-        'harga',
-        'stok',
+        'product_id',
+        'product_sku_code',
+        'price',
+        'stock',
         'status',
         'multi',
-        'jam_buka',
-        'jam_tutup',
+        'start_cut_off',
+        'end_cut_off',
     ];
 
     public function supplier()
@@ -26,13 +26,13 @@ class SupplierProduk extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function produk()
+    public function product()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function topup_api()
     {
-        return $this->hasMany(TopupApi::class, 'supplier_produk_id', 'id');
+        return $this->hasMany(TopupApi::class, 'product_supplier_id');
     }
 }

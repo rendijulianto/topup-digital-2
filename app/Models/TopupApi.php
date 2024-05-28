@@ -16,11 +16,11 @@ class TopupApi extends Model
     protected $fillable = [
         'topup_id',
         'trx_id',
-        'supplier_produk_id',
+        'product_supplier_id',
         'supplier_id',
-        'pengguna_id',
+        'user_id',
         'ref_id',
-        'keterangan',
+        'note',
         'status'
     ];
 
@@ -30,9 +30,9 @@ class TopupApi extends Model
         return $this->belongsTo(Topup::class);
     }
 
-    public function supplier_produk()
+    public function product_suppliers()
     {
-        return $this->belongsTo(SupplierProduk::class, 'supplier_produk_id');
+        return $this->belongsTo(ProductSupplier::class, 'product_supplier_id');
     }
 
     public function supplier()
@@ -42,7 +42,7 @@ class TopupApi extends Model
 
     public function user()
     {
-        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+        return $this->belongsTo(User::class);
     }
 
     

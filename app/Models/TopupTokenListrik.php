@@ -13,9 +13,9 @@ class TopupTokenListrik extends Model
 
     protected $fillable = [
         'topup_id',
-        'nama_pelanggan',
-        'nomor_meter',
-        'id_pelanggan',
+        'customer_name',
+        'meter_no',
+        'subscriber_id',
         'segment_power'
     ];
 

@@ -41,8 +41,8 @@
                                         <option value="">Semua</option>
                                         @foreach ($products as $product)
                                             <option
-                                            {{ request()->produk == $product->id ? 'selected' : '' }}
-                                            value="{{ $product->id }}">{{ $product->nama }}</option>
+                                            {{ request()->product == $product->id ? 'selected' : '' }}
+                                            value="{{ $product->id }}">{{ $product->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -82,11 +82,11 @@
                                 <select class="form-control select-2" name="filter_date">
                                     <option value="">Semua</option>
                                     <option 
-                                        {{request()->filter_date == 'tgl_transaksi' ? 'selected' : ''}}
-                                    value="tgl_transaksi">Tgl Transaksi</option>
+                                        {{request()->filter_date == 'transacted_at' ? 'selected' : ''}}
+                                    value="transacted_at">Tgl Transaksi</option>
                                     <option 
-                                        {{request()->filter_date == 'tgl_kadaluwarsa' ? 'selected' : ''}}
-                                    value="tgl_kadaluwarsa">Kadaluwarsa</option>
+                                        {{request()->filter_date == 'expired_at' ? 'selected' : ''}}
+                                    value="expired_at">Kadaluwarsa</option>
                                     <option 
                                         {{request()->filter_date == 'created_at' ? 'selected' : ''}}
                                     value="created_at">Dibuat</option>
@@ -123,10 +123,10 @@
                                 @forelse ($vouchers as $voucher)
                                 <tr>
                                     <th>{{ $voucher->id }}</th>
-                                    <td>{{$voucher->nomor}}</td>
-                                    <td>{{$voucher->produk->nama}}</td>
+                                    <td>{{$voucher->target}}</td>
+                                    <td>{{$voucher->product->name}}</td>
                                     <td>
-                                        Rp. {{number_format($voucher->harga_beli,0,',','.')}}
+                                        Rp. {{number_format($voucher->price_buy,0,',','.')}}
                                     </td>
                                     <td>
                                         {{Str::ucfirst($voucher->status)}}
@@ -238,7 +238,7 @@
         const status = document.querySelector('select[name="status"]').value;
         const product = document.querySelector('select[name="product"]').value;
         const filter_date = document.querySelector('select[name="filter_date"]').value;
-        window.location.href = `{{ route('injector.vouchers.index') }}?search=${search}&start=${start}&end=${end}&status=${status}&produk=${product}&filter_date=${filter_date}`;
+        window.location.href = `{{ route('injector.vouchers.index') }}?search=${search}&start=${start}&end=${end}&status=${status}&product=${product}&filter_date=${filter_date}`;
     }
 
    $('.select-2').on('change', function() {
@@ -359,27 +359,27 @@
                     
                     <div class="col-lg-12">
                         <div class="mb-3">
-                            <label for="detail_nomor" class="form-label">Nomor</label>
-                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.nomor}" readonly>
+                            <label for="detail_target" class="form-label">Nomor</label>
+                            <input type="text" class="form-control" id="detail_target" readonly value="${response.data.target}" readonly>
                         </div>
                     </div>
                 <div class="col-lg-6">
                     <div class="mb-3">
-                        <label for="detail_produk" class="form-label">Produk</label>
-                        <input type="text" class="form-control" id="detail_produk" readonly value="${response.data.produk}">
+                        <label for="detail_product" class="form-label">Produk</label>
+                        <input type="text" class="form-control" id="detail_product" readonly value="${response.data.product}">
                     </div>
                 </div>
                    
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_harga" class="form-label">Harga</label>
-                            <input type="text" class="form-control" id="detail_harga" readonly value="${response.data.harga_beli}">
+                            <input type="text" class="form-control" id="detail_harga" readonly value="${response.data.price_buy}">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="detail_keterangan" class="form-label">Keterangan</label>
-                            <input type="text" class="form-control" id="detail_keterangan" readonly value="${response.data.keterangan}">
+                            <label for="detail_note" class="form-label">Keterangan</label>
+                            <input type="text" class="form-control" id="detail_note" readonly value="${response.data.note}">
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -391,19 +391,19 @@
                     <div class="col-lg-3">
                         <div class="mb-3">
                             <label for="detail_tgl_transaksi" class="form-label">Tgl Transaksi</label>
-                            <input type="datetime" class="form-control" id="detail_tgl_transaksi" readonly value="${response.data.tgl_transaksi}">
+                            <input type="datetime" class="form-control" id="detail_tgl_transaksi" readonly value="${response.data.transacted_at}">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_kasir" class="form-label">Kasir</label>
-                            <input type="text" class="form-control" id="detail_kasir" readonly value="${response.data.kasir}">
+                            <input type="text" class="form-control" id="detail_kasir" readonly value="${response.data.cashier}">
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="detail_tgl_expired" class="form-label">TGL EXPIRED</label>
-                            <input type="text" class="form-control" id="detail_tgl_expired" readonly value="${response.data.detail.tgl_kadaluwarsa}">
+                            <input type="text" class="form-control" id="detail_tgl_expired" readonly value="${response.data.detail.expired_at}">
                         </div>
                     </div>
                     <div class="col-lg-12">
@@ -433,10 +433,10 @@
                                     ${value.supplier}
                                 </td>
                                 <td>
-                                    ${value.keterangan}
+                                    ${value.note}
                                 </td>
                                 <td>
-                                    ${value.waktu}
+                                    ${value.created_at}
                                 </td>
                                 <td>
                                     ${value.status}

@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banner', function (Blueprint $table) {
+        Schema::create('banners', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->string('judul', 50);
-            $table->string('gambar', 60);
-            $table->boolean('status')->default(1);
+            $table->string('title', 50);
+            $table->string('image', 60);
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE banner MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE banners MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
     }
 
     /**
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('banner');
+        Schema::dropIfExists('banners');
     }
 };

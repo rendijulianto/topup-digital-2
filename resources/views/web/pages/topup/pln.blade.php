@@ -83,7 +83,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -94,7 +94,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -105,7 +105,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -116,7 +116,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -127,7 +127,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -138,7 +138,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -149,7 +149,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -160,7 +160,7 @@
                                 <a class="card" href="">
                                     <div class="card-body d-flex flex-column justify-content-center align-items-center">
 
-                                        <p>DANA 700.000</p>                                        </p>
+                                        <p>PLN 700.000</p>                                        </p>
                                         <b>
                                             Rp 405.000,00
                                         </b>
@@ -250,18 +250,18 @@
                                     ${product_terlaris.id == product.id ? '<span class="badge badge-info position-absolute" style="top: 0; right: 0; color: white !important; background-color: red !important; font-size: 12px; font-weight: bold;">Terlaris</span>' : ''}
                                     <div class="card-body card-product disabled opacity-50 ${product.status == false ? 'bg-danger text-white gangguan' : ''}"
                                         data-id="${product.id}"
-                                        data-name="${product.nama}"
-                                        data-selling_price="${product.harga}"
-                                        data-description="${product.deskripsi}"
+                                        data-name="${product.name}"
+                                        data-selling_price="${product.price}"
+                                        data-description="${product.description}"
                                         data-status="${product.status}">
-                                        <h2>${product.nama}</h2>
+                                        <h2>${product.name}</h2>
                                         
                                                     
                                         ${product.status == false ? '<b>Produk sedang gangguan</b>' : `<b>
                                             Bayar: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
                                             minimumFractionDigits: 0
                                         
-                                        }).format(product.harga)}
+                                        }).format(product.price)}
                                         </b> <br/>`}
                                     </div>
                                 </div>
@@ -284,7 +284,7 @@
                             $('#product_id').val($(this).data('id'));
                             $('#show_number').val($('#number').val());
                             $('#show_product_name').val($(this).data('name'));
-                            $('#show_product_selling_price').val(formatAngka($(this).data('selling_price'), 'rupiah'));
+                            $('#show_product_selling_price').val($(this).data('selling_price'));
                             $('#show_product_description').val($(this).data('description'));
                             $('#modalDetail').modal('show');
                         });
@@ -332,7 +332,7 @@
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
-                    nomor: number
+                    target: number
                 },
                 beforeSend: function(){
                     // progress loading
@@ -353,11 +353,11 @@
                         $('#customer_meter_no').html(response.data.meter_no);
                         $('#customer_subscriber_id').html(response.data.subscriber_id);
                         $('#customer_segment_power').html(response.data.segment_power);
-                        $('#customer_name').html(response.data.nama);
+                        $('#customer_name').html(response.data.name);
                         $('#show_number').val(response.data.meter_no);
                         $('#show_subscriber_id').val(response.data.subscriber_id);
                         $('#show_segment_power').val(response.data.segment_power);
-                        $('#show_name').val(response.data.nama);
+                        $('#show_name').val(response.data.name);
                         
                         $('#customer').show();
                         // disabled hapus yang tidak memiliki kelas bg-danger text-white sebelumnya
@@ -419,25 +419,19 @@
 
     $('#btnCreateOrder').click(function(){
             
-                    let product_id = $('.card-product.active').data('id');
-                    let number = $('#number').val();
-                    let whatsapp = $('#whatsapp').val();
-                    let nama_pelanggan = $('#customer_name').html();
-                    let meter_no = $('#customer_meter_no').html();
-                    let subscriber_id = $('#customer_subscriber_id').html();
-                    let segment_power = $('#customer_segment_power').html();
+                  
                     $.ajax({
                         url: "{{route('api.topups.store')}}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",
-                            produk_id: product_id,
-                            nomor: number,
-                            whatsapp: whatsapp,
-                            nama_pelanggan: nama_pelanggan,
-                            id_pelanggan: subscriber_id,
-                            nomor_meter: meter_no,
-                            segment_power: segment_power
+                            product_id: $('.card-product.active').data('id'),
+                            target: $('#number').val(),
+                            whatsapp: $('#whatsapp').val(),
+                            customer_name: $('#customer_name').html(),
+                            subscriber_id: $('#customer_subscriber_id').html(),
+                            meter_no: $('#customer_meter_no').html(),
+                            segment_power: $('#customer_segment_power').html(),
                         },
                         beforeSend: function(){
                             // progress loading
@@ -458,14 +452,12 @@
                                     confirmButtonText: `OK`,
                                     timer: 2000,
                                 }).then((result) => {
-                                    @if(request()->isGuest == "true")
+                             
                                         id = response.data.id;
-                                        url = "{{route('topup.detail', ['id' => ':id'])}}?isGuest=true";
+                                        url = "{{route('topup.detail', ['id' => ':id'])}}?isCustomer=true";
                                         url = url.replace(':id', id);
                                         window.location.href = url;
-                                    @else
-                                        window.location.href = "{{route('cashier.topup')}}";
-                                    @endif
+                                   
                                 })
                                 $('#modalDetail').modal('hide');
                                 $('#whatsapp').val('');

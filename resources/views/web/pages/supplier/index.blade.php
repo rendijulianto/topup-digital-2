@@ -18,7 +18,7 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h4 class="card-title">Daftar Supplier</h4>
+                <h4 class="card-title"><i class="ri-store-2-line"></i> Daftar Supplier</h4>
                 <button id="btnModalTambah" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> Tambah</button>
             </div>
             <div class="card-body">
@@ -51,7 +51,7 @@
                                 @forelse ($suppliers as $supplier)
                                 <tr>
                                     <th>{{ ($loop->index + 1) + ($suppliers->currentPage() - 1) * $suppliers->perPage() }}</th>
-                                    <td>{{$supplier->nama}}</td>
+                                    <td>{{$supplier->name}}</td>
                                    
                                     <td>
                                                 <a 

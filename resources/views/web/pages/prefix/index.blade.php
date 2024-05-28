@@ -17,7 +17,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h4 class="card-title">
-                    <i class="fa fa-list"></i>
+                <i class="ri-focus-2-line"></i>
                     Daftar Prefix
                 </h4>
                 <button id="btnModalTambah" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> Tambah</button>
@@ -32,7 +32,7 @@
                                 @foreach ($brands as $brand)
                                     <option 
                                         {{ request()->brand == $brand->id ? 'selected' : '' }}
-                                    value="{{ $brand->id }}">{{ $brand->nama }}</option>
+                                    value="{{ $brand->id }}">{{ $brand->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -64,10 +64,10 @@
                                         @forelse ($prefixes as $prefix)
                                         <tr>
                                             <th>{{ ($loop->index + 1) + ($prefixes->currentPage() - 1) * $prefixes->perPage() }}</th>
-                                            <td>{{$prefix->nomor}}</td>
+                                            <td>{{$prefix->number}}</td>
                                             <td>
                                                 <img src="{{$prefix->brand->logo_url}}" alt="" width="50px" class="me-2"> <br>
-                                                {{$prefix->brand->nama}}
+                                                {{$prefix->brand->name}}
                                             </td>
                                             <td>
                                                 <a 

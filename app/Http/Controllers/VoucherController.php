@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Topup, Brand, Kategori, Pelanggan, Produk, Supplier, Tipe, Pengguna};
+use App\Models\{Topup, Brand, Category, Product, Supplier, Type, User};
 
 // Carbon
 use Carbon\Carbon;
@@ -27,15 +27,15 @@ class VoucherController extends Controller
         }
 
         $statusCounts = Topup::searchVoucher($request)
-        ->with('produk')
-        ->where('tipe','voucher')
+        ->with('product')
+        ->where('type','voucher')
         ->latest()
         ->get()
         ->groupBy('status')
         ->map(function ($group) {
             return [
-                'total' => $group->sum('harga_jual'),
-                'total_buy' => $group->sum('harga_beli'),
+                'total' => $group->sum('price_sell'),
+                'total_buy' => $group->sum('price_buy'),
                 'count' => $group->count(),
             ];
         });
@@ -58,19 +58,20 @@ class VoucherController extends Controller
     // Menghitung total profit
     $totalProfit = $totalSuccess - ($statusCounts['sukses']['total_buy'] ?? 0);
     
-    $products = Produk::category('aktivasi-voucher')->orderBy('nama', 'asc')->get();
-    $brands = Brand::category('aktivasi-voucher')->orderBy('nama', 'asc')->get();
-    $types = Tipe::category('aktivasi-voucher')->orderBy('nama', 'asc')->get();
-    $categories = Kategori::orderBy('nama', 'asc')->get();
-    $suppliers = Supplier::orderBy('nama', 'asc')->get();
-    $users = Pengguna::orderBy('nama', 'asc')->get();
+    $products = Product::categories('aktivasi voucher')->orderBy('name', 'asc')->get();
+    $brands = Brand::category('aktivasi voucher')->orderBy('name', 'asc')->get();
+    $types = Type::category('aktivasi voucher')->orderBy('name', 'asc')->get();
+    $categories = Category::orderBy('name', 'asc')->get();
+    $suppliers = Supplier::orderBy('name', 'asc')->get();
+    $users = User::orderBy('name', 'asc')->get();
     
     // Mendapatkan data dengan paginasi
     $vouchers = Topup::searchVoucher($request)
-        ->with('produk')
-        ->where('tipe','voucher')
+        ->with('product')
+        ->where('type','voucher')
         ->latest()
         ->paginate(config('app.pagination.default'));
+      
      
         return view('web.pages.voucher.index', compact(
             'vouchers', 
@@ -101,7 +102,7 @@ class VoucherController extends Controller
      */
     public function create()
     {
-        $category = Kategori::where('nama', 'Aktivasi Voucher')->first();
+        $category = Category::where('name', 'Aktivasi Voucher')->first();
         $brands = Brand::category($category->id)->get();
         return view('web.pages.inject.create', compact('brands', 'category'));
     }
@@ -127,12 +128,15 @@ class VoucherController extends Controller
             $request->start = $start->format('Y-m-d');
             $request->end = $end->format('Y-m-d');
         }
+        if(!$request->filter_date) {
+            $request->filter_date = 'created_at';
+        }
         $vouchers = Topup::
         search($request)->
-        with('produk')->
+        with('product')->
         latest()->
-        where('tipe','voucher')->orderBy('created_at', 'desc')->paginate(config('app.pagination.default'));
-        $products = Produk::category('aktivasi voucher')->orderBy('nama', 'asc')->get();
+        where('type','voucher')->orderBy('created_at', 'desc')->paginate(config('app.pagination.default'));
+        $products = Product::categories('aktivasi voucher')->orderBy('name', 'asc')->get();
         return view('web.pages.voucher.injector', compact('vouchers', 'products', 'start', 'end'));
     }
 

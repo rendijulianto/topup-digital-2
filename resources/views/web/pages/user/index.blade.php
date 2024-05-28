@@ -23,21 +23,21 @@
                     <div class="col-lg-12 mb-3">
                         <div class="row">
                             <div class="col-lg-6 mb-1">
-                                <label class="control-label">Jabatan</label>
+                                <label class="control-label">Peran</label>
                                 <div class="input-group">
-                                    <select class="form-control select-2" name="jabatan">
+                                    <select class="form-control select-2" name="role">
                                         <option>Semua</option>
                                         <option
                                             value="admin"
-                                            {{ request()->jabatan == 'admin' ? 'selected' : '' }}
+                                            {{ request()->role == 'admin' ? 'selected' : '' }}
                                         >Admin</option>
                                         <option
                                             value="kasir"
-                                            {{ request()->jabatan == 'kasir' ? 'selected' : '' }}
+                                            {{ request()->role == 'kasir' ? 'selected' : '' }}
                                         >Kasir</option>
                                         <option
                                             value="injector"
-                                            {{ request()->jabatan == 'injector' ? 'selected' : '' }}
+                                            {{ request()->role == 'injector' ? 'selected' : '' }}
                                         >Injector</option>
                                     </select>
                                 </div>
@@ -62,7 +62,7 @@
                                         <tr>
                                             <th>No</th>
                                             <th>Nama</th>
-                                            <th>Jabatan</th>
+                                            <th>Peran</th>
                                             <th>Aksi</th>
                                         </tr>
                                         </thead>
@@ -70,8 +70,8 @@
                                         @forelse ($users as $user)
                                         <tr>
                                             <th>{{ ($loop->index + 1) + ($users->currentPage() - 1) * $users->perPage() }}</th>
-                                            <td>{{$user->nama}}</td>
-                                            <td>{{$user->jabatan}}</td>
+                                            <td>{{$user->name}}</td>
+                                            <td>{{$user->role}}</td>
                                             <td>
                                                 <a 
                                                 onclick="handleEdit({{$user->id}})"
@@ -152,11 +152,11 @@
 <script>
     const handleSearch = () => {
         const search = document.querySelector('input[name="search"]').value;
-        const jabatan = document.querySelector('select[name="jabatan"]').value;
-        window.location.href = `{{route('admin.users.index')}}?search=${search}&jabatan=${jabatan}`;
+        const role = document.querySelector('select[name="role"]').value;
+        window.location.href = `{{route('admin.users.index')}}?search=${search}&role=${role}`;
     }
 
-    document.querySelector('select[name="jabatan"]').addEventListener('change', (e) => {
+    document.querySelector('select[name="role"]').addEventListener('change', (e) => {
         handleSearch();
     });
 

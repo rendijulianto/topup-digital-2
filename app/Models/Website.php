@@ -12,9 +12,9 @@ class Website extends Model
     protected $table = 'website';
 
     protected $fillable = [
-        'nama',
-        'alamat',
-        'nomor_telepon',
+        'name',
+        'address',
+        'telp',
         'logo_website',
         'logo_print',	
     ];

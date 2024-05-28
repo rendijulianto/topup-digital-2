@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->string('nama', 50);
+            $table->string('name', 50);
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE kategori MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE categories MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
     }
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori');
+        Schema::dropIfExists('categories');
     }
 };

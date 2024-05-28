@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brand', function (Blueprint $table) {
+        Schema::create('brands', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->string('nama', 50)->unique();
+            $table->string('name', 50)->unique();
             $table->string('logo', 50)->nullable();
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE brand MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE brands MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brand');
+        Schema::dropIfExists('brands');
     }
 };

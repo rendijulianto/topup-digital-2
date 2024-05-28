@@ -47,9 +47,9 @@
                                         @forelse ($brands as $brand)
                                         <tr>
                                             <th>{{ ($loop->index + 1) + ($brands->currentPage() - 1) * $brands->perPage() }}</th>
-                                            <td>{{$brand->nama}}</td>
+                                            <td>{{$brand->name}}</td>
                                             <td>
-                                                <img src="{{$brand->logo_url}}" alt="{{$brand->nama}}" class="img-fluid" width="100px">
+                                                <img src="{{$brand->logo_url}}" alt="{{$brand->name}}" class="img-fluid" width="100px">
                                             </td>
                                             <td>
                                                 <a 

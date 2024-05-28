@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Kategori,LogAktivitas};
+use App\Models\{Category,ActivityLog};
 use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
@@ -11,7 +11,7 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Kategori::search($request)->orderBy('nama', 'asc')->paginate(config('app.pagination.default'));
+        $categories = Category::search($request)->orderBy('name', 'asc')->paginate(config('app.pagination.default'));
 
         return view('web.pages.category.index', compact('categories'));
     }
@@ -30,22 +30,22 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:kategori,nama'],
+            'name' => ['required','string','max:255','unique:categories,name'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
         ]);
 
         try {
-            $category = Kategori::create([
-                'nama' => $request->nama,
+            $category = Category::create([
+                'name' => $request->name,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan kategori baru: ' . $category->nama,
+                'note' => 'Menambahkan kategori baru: ' . $category->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -65,7 +65,7 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Kategori $category)
+    public function edit(Category $category)
     {
         return view('web.pages.category.edit', compact('category'));
     }
@@ -73,26 +73,26 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Kategori $category)
+    public function update(Request $request, Category $category)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:kategori,nama,' . $category->id],
+            'name' => ['required','string','max:255','unique:categories,name,' . $category->id],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
         ]);
 
         try {
             $category->update([
-                'nama' => $request->nama,
+                'name' => $request->name,
                 
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah kategori: ' . $category->nama,
+                'note' => 'Mengubah kategori: ' . $category->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -110,14 +110,14 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Kategori $category)
+    public function destroy(Category $category)
     {
         try {
             $category->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => request()->ip(),
-                'keterangan' => 'Menghapus kategori: ' . $category->nama,
+                'note' => 'Menghapus kategori: ' . $category->name,
                 'user_agent' => request()->header('User-Agent'),
             ]);
             return response()->json([

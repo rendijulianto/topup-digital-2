@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Supplier,LogAktivitas};
+use Carbon\Carbon;
+use App\Models\{Supplier,ActivityLog};
 class SupplierController extends Controller
 {
     /**
@@ -11,7 +12,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::orderBy('nama')->
+        $suppliers = Supplier::orderBy('name')->
         paginate(config('app.pagination.default'));
 
         return view('web.pages.supplier.index', compact('suppliers'));
@@ -31,21 +32,21 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-              'nama' => 'required|string|max:50|unique:supplier,nama',
+              'name' => 'required|string|max:50|unique:suppliers,name',
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.unique' => 'Nama sudah terdaftar!',
         ]);
 
         try {
             Supplier::create([
-                'nama' => $request->nama,
+                'name' => $request->name,
             ]);
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan supplier baru: ' . $request->nama,
+                'note' => 'Menambahkan supplier baru: ' . $request->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
@@ -83,20 +84,20 @@ class SupplierController extends Controller
     public function update(Request $request, Supplier $supplier)
     {
         $this->validate($request, [
-              'nama' => 'required|string|max:255|unique:supplier,nama,' . $supplier->id,
+              'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.unique' => 'Nama sudah terdaftar!'
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.unique' => 'Nama sudah terdaftar!'
         ]);
         
         try {
             $supplier->update([
-                'nama' => $request->nama
+                'name' => $request->name
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah supplier: ' . $supplier->nama,
+                'note' => 'Mengubah supplier: ' . $supplier->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -118,10 +119,10 @@ class SupplierController extends Controller
     {
         try {
             $supplier->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menghapus supplier: ' . $supplier->nama,
+                'note' => 'Menghapus supplier: ' . $supplier->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -137,11 +138,20 @@ class SupplierController extends Controller
     // performance
     public function report(Request $request)
     {
+        if ($request->start && $request->end) {
+            $start = Carbon::parse($request->start);
+            $end = Carbon::parse($request->end);
+        } else {
+            $start = Carbon::now()->startOfMonth();
+            $end = Carbon::now()->endOfMonth();
+            $request->start = $start->format('Y-m-d');
+            $request->end = $end->format('Y-m-d');
+        }
         $suppliers = Supplier::
         performance($request)
         ->orderBy('total_transaksi','desc')->
         get();
-        return view('web.pages.supplier.performance', compact('suppliers'));
+        return view('web.pages.supplier.performance', compact('suppliers','start','end'));
     }
 
 

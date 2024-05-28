@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Tipe,LogAktivitas};
+use App\Models\{Type,ActivityLog};
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 class TypeController extends Controller
@@ -12,7 +12,7 @@ class TypeController extends Controller
      */
     public function index(Request $request)
     {
-        $types = Tipe::search($request)->orderBy('nama', 'asc')->paginate(config('app.pagination.default'));
+        $types = Type::search($request)->orderBy('name', 'asc')->paginate(config('app.pagination.default'));
 
         return view('web.pages.type.index', compact('types'));
     }
@@ -31,23 +31,23 @@ class TypeController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:tipe,nama'],
+            'name' => ['required','string','max:255','unique:types,name'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
         ]);
 
         try {
-            $type = Tipe::create([
-                'nama' => $request->nama,
+            $type = Type::create([
+                'name' => $request->name,
                 
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan tipe baru: ' . $type->nama,
+                'note' => 'Menambahkan tipe baru: ' . $type->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([
@@ -65,7 +65,7 @@ class TypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Tipe $type)
+    public function edit(Type $type)
     {
         return view('web.pages.type.edit', compact('type'));
     }
@@ -73,25 +73,25 @@ class TypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Tipe $type)
+    public function update(Request $request, Type $type)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:tipe,nama,' . $type->id],
+            'name' => ['required','string','max:255','unique:types,name,' . $type->id],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
         ]);
 
         try {
             $type->update([
-                'nama' => $request->nama,
+                'name' => $request->name,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengupdate tipe: ' . $type->nama,
+                'note' => 'Mengupdate tipe: ' . $type->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
             return response()->json([
@@ -109,14 +109,14 @@ class TypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Tipe $type)
+    public function destroy(Type $type)
     {
         try {
             $type->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => request()->ip(),
-                'keterangan' => 'Menghapus tipe: ' . $type->nama,
+                'note' => 'Menghapus tipe: ' . $type->name,
                 'user_agent' => request()->header('User-Agent'),
             ]);
             return response()->json([

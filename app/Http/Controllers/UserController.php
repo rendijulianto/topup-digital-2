@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Pengguna, LogAktivitas};
+use App\Models\{User, ActivityLog};
 
 class UserController extends Controller
 {
@@ -12,7 +12,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = Pengguna::search($request)->orderBy('nama', 'asc')->paginate(config('app.pagination.default'));
+        $users = User::search($request)->orderBy('name', 'asc')->paginate(config('app.pagination.default'));
         return view('web.pages.user.index', compact('users'));
     }
 
@@ -30,15 +30,15 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:50'],
-            'email' => ['required','string','max:30','unique:pengguna,email'],
+            'name' => ['required','string','max:50'],
+            'email' => ['required','string','max:30','unique:users,email'],
             'password' => ['required','string','max:64'],
-            'jabatan' => ['required','string','in:admin,kasir,injector'],
-            'pin' => ['required_if:jabatan,kasir','nullable','numeric','digits:6'],
+            'role' => ['required','string','in:admin,kasir,injector'],
+            'pin' => ['required_if:role,kasir','nullable','numeric','digits:6'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 50 karakter!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 50 karakter!',
             'email.required' => 'Nama pengguna tidak boleh kosong!',
             'email.string' => 'Nama pengguna harus berupa string!',
             'email.max' => 'Nama pengguna maksimal 30 karakter!',
@@ -46,9 +46,9 @@ class UserController extends Controller
             'password.required' => 'Kata sandi tidak boleh kosong!',
             'password.string' => 'Kata sandi harus berupa string!',
             'password.max' => 'Kata sandi maksimal 64 karakter!',
-            'jabatan.required' => 'Jabatan tidak boleh kosong!',
-            'jabatan.string' => 'Jabatan harus berupa string!',
-            'jabatan.in' => 'Jabatan harus admin atau kasir!',
+            'role.required' => 'Peran tidak boleh kosong!',
+            'role.string' => 'Peran harus berupa string!',
+            'role.in' => 'Peran harus admin atau kasir!',
             'pin.required_if' => 'Pin tidak boleh kosong!',
             'pin.numeric' => 'Pin harus berupa angka!',
             'pin.digits' => 'Pin harus 6 digit!',
@@ -56,14 +56,14 @@ class UserController extends Controller
         ]);
 
         try {
-            $user = Pengguna::create([
-                'nama' => $request->nama,
+            $user = User::create([
+                'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
-                'jabatan' => $request->jabatan,
+                'role' => $request->role,
             ]);
 
-            if ($request->jabatan == 'kasir') {
+            if ($request->role == 'kasir') {
                 $this->validate($request, [
                     'pin' => ['required','numeric','digits:6'],
                 ], [
@@ -75,10 +75,10 @@ class UserController extends Controller
                     'pin' => bcrypt($request->pin)
                 ]);
             }
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan pengguna baru dengan id '.$user->id,
+                'note' => 'Menambahkan pengguna baru dengan id '.$user->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([
@@ -96,7 +96,7 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Pengguna $user)
+    public function show(User $user)
     {
         return view('web.pages.user.show', compact('user'));
     }
@@ -104,7 +104,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Pengguna $user)
+    public function edit(User $user)
     {
         return view('web.pages.user.edit', compact('user'));
     }
@@ -112,38 +112,38 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Pengguna $user)
+    public function update(Request $request, User $user)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:50'],
-            'email' => ['required','string','max:30','unique:pengguna,email,'.$user->id],
+            'name' => ['required','string','max:50'],
+            'email' => ['required','string','max:30','unique:users,email,'.$user->id],
             'password' => ['nullable','string','max:64'],
-            'jabatan' => ['required','string','in:admin,kasir'],
+            'role' => ['required','string','in:admin,kasir'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 50 karakter!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 50 karakter!',
             'email.required' => 'Nama pengguna tidak boleh kosong!',
             'email.string' => 'Nama pengguna harus berupa string!',
             'email.max' => 'Nama pengguna maksimal 30 karakter!',
             'email.unique' => 'Nama pengguna sudah terdaftar!',
             'password.string' => 'Kata sandi harus berupa string!',
             'password.max' => 'Kata sandi maksimal 64 karakter!',
-            'jabatan.required' => 'Jabatan tidak boleh kosong!',
-            'jabatan.string' => 'Jabatan harus berupa string!',
-            'jabatan.in' => 'Jabatan harus admin atau kasir!',
+            'role.required' => 'Peran tidak boleh kosong!',
+            'role.string' => 'Peran harus berupa string!',
+            'role.in' => 'Peran harus admin atau kasir!',
         ]);
     
 
         try {
             $user->update([
-                'nama' => $request->nama,
+                'name' => $request->name,
                 'email' => $request->email,
                 'password' => $request->password ? bcrypt($request->password) : $user->password,
-                'jabatan' => $request->jabatan
+                'role' => $request->role
             ]);
 
-            if ($request->jabatan == 'kasir') {
+            if ($request->role == 'kasir') {
                if ($request->pin) {
                     $this->validate($request, [
                         'pin' => ['required','numeric','digits:6'],
@@ -161,10 +161,10 @@ class UserController extends Controller
             } else {
                 $user->pin()->delete();
             }
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah pengguna dengan id '.$user->id,
+                'note' => 'Mengubah pengguna dengan id '.$user->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([
@@ -182,10 +182,17 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Pengguna $user)
+    public function destroy(User $user)
     {
         try {
             $user->delete();
+
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
+                'ip' => request()->ip(),
+                'note' => 'Menghapus pengguna dengan id '.$user->id,
+                'user_agent' => request()->header('User-Agent'),
+            ]);
             return response()->json([
                 'status' => true,
                 'message' => 'Data berhasil dihapus',
@@ -200,22 +207,22 @@ class UserController extends Controller
 
     public function profile()
     {
-        $user = auth()->guard('pengguna')->user();
+        $user = auth()->guard()->user();
         return view('web.pages.user.profile', compact('user'));
     }
 
     public function updateProfile(Request $request)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:50'],
+            'name' => ['required','string','max:50'],
             'pin' => ['nullable','numeric','digits:6'],
             'pin_baru' => ['nullable','numeric','digits:6'],
             'kata_sandi' => ['nullable','string','max:64'],
             'kata_sandi_baru' => ['nullable','string','max:64'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 50 karakter!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 50 karakter!',
             'pin.numeric' => 'Pin harus berupa angka!',
             'pin.digits' => 'Pin harus 6 digit!',
             'pin_baru.numeric' => 'Pin baru harus berupa angka!',
@@ -227,7 +234,7 @@ class UserController extends Controller
         ]);
 
         try {
-            $pengguna = Pengguna::find(auth()->guard('pengguna')->user()->id);
+            $pengguna = User::find(auth()->guard()->user()->id);
 
             if ($request->kata_sandi) {
                 if (!password_verify($request->kata_sandi, $pengguna->password)) {
@@ -241,7 +248,7 @@ class UserController extends Controller
                 ]);
             }
 
-            if ($pengguna->jabatan == 'kasir' || $pengguna->jabatan == 'injector') {
+            if ($pengguna->role == 'kasir' || $pengguna->role == 'injector') {
                 if ($request->pin) {
                     if (!password_verify($request->pin, $pengguna->pin->pin)) {
                         return response()->json([
@@ -256,13 +263,13 @@ class UserController extends Controller
             }
 
             $pengguna->update([
-                'nama' => $request->nama
+                'name' => $request->name
             ]);
 
-            LogAktivitas::create([
-                'pengguna_id' => $pengguna->id,
+            ActivityLog::create([
+                'user_id' => $pengguna->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengupdate profil',
+                'note' => 'Mengupdate profil',
                 'user_agent' => $request->header('User-Agent'),
             ]);
 

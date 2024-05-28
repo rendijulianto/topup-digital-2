@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Cron;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Kategori, Brand, Tipe, Produk, Supplier, SupplierProduk};
+use App\Models\{Category, Brand, Type, Product, Supplier, ProductSupplier};
 use Illuminate\Support\Str;
 use App\Services\DigiflazzService;
 set_time_limit(3600);
@@ -127,38 +127,51 @@ class ProductController extends Controller
                     continue;
                 }
 
-                $category = Kategori::firstOrCreate(['nama' => $product->category]);
-                $brand = Brand::firstOrCreate(['nama' => $product->brand]);
-                $type = Tipe::firstOrCreate(['nama' => $product->type]);
-                $supplier = Supplier::firstOrCreate(['nama' => $product->seller_name]);
-                $productData = Produk::firstOrCreate(
+                $category = Category::firstOrCreate(['name' => $product->category]);
+                $brand = Brand::firstOrCreate(['name' => $product->brand]);
+                $type = Type::firstOrCreate(['name' => $product->type]);
+                $supplier = Supplier::firstOrCreate(['name' => $product->seller_name]);
+                $productData = Product::firstOrCreate(
                     [
-                        'nama' => $product->product_name,
-                        'kategori_id' => $category->id,
-                        'tipe_id' => $type->id,
+                        'name' => $product->product_name,
+                        'category_id' => $category->id,
+                        'type_id' => $type->id,
                         'brand_id' => $brand->id,
-                        'deskripsi' => $product->desc,
+                        'description' => $product->desc
                     ]
                 );
 
                 $status = $product->buyer_product_status == 1 ? $product->seller_product_status ? 1 : 0 : 0;
                 $stock = $product->unlimited_stock == 1 ? 999999 : $product->stock;
-                $productSupplier = SupplierProduk::where('produk_sku_code', $product->buyer_sku_code)->first();
+                $productSupplier = ProductSupplier::where('product_sku_code', $product->buyer_sku_code)->first();
                 if (!$productSupplier) {
-                    $productSupplier = new SupplierProduk();
-                    $productSupplier->produk_sku_code = $product->buyer_sku_code;
+                    $productSupplier = ProductSupplier::create(
+                        [
+                            'product_sku_code' => $product->buyer_sku_code,
+                            'product_id' => $productData->id,
+                            'supplier_id' => $supplier->id,
+                            'price' => $product->price,
+                            'stock' => $stock,
+                            'status' => $status,
+                            'multi' => $product->multi,
+                            'start_cut_off' => $product->start_cut_off ? $product->start_cut_off : '00:00:00',
+                            'end_cut_off' => $product->end_cut_off ? $product->end_cut_off : '00:00:00',
+                        ]
+                    );
+                } else {
+                    $productSupplier->product_sku_code = $product->buyer_sku_code;
+                    $productSupplier->product_id = $productData->id;
+                    $productSupplier->supplier_id = $supplier->id;
+                    $productSupplier->price = $product->price;
+                    $productSupplier->stock = $stock;
+                    $productSupplier->status = $status;
+                    $productSupplier->multi = $product->multi;
+                    $productSupplier->start_cut_off = $product->start_cut_off ? $product->start_cut_off : '00:00:00';
+                    $productSupplier->end_cut_off = $product->end_cut_off ? $product->end_cut_off : '00:00:00';
+                    $productSupplier->save();
                 }
-                $productSupplier->produk_id = $productData->id;
-                $productSupplier->supplier_id = $supplier->id;
-                $productSupplier->harga = $product->price;
-                $productSupplier->stok = $stock;
-                $productSupplier->status = $status;
-                $productSupplier->multi = $product->multi;
-                $productSupplier->jam_buka = $product->start_cut_off ? $product->start_cut_off : '00:00:00';
-                $productSupplier->jam_tutup = $product->end_cut_off ? $product->end_cut_off : '00:00:00';
-                $productSupplier->save();
 
-                $profit =  $productData->harga - $productSupplier->harga;
+                $profit =  $productData->price - $productSupplier->price;
 
                 if ($profit < 2000) {
                     switch (Str::lower($category->nama)) {
@@ -179,7 +192,7 @@ class ProductController extends Controller
                             break;
                     }
                     $productData->update([
-                        'harga' => $selling_price,
+                        'price' => $selling_price,
                     ]);
 
                 }

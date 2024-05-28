@@ -7,7 +7,6 @@
     <div class="col-12">
         <div class="page-title-box">
             <h4 class="page-title">
-                <i class="ri ri-shopping-cart-2-line"></i>
                 Laporan Voucher 
             </h4>
         </div>
@@ -20,7 +19,7 @@
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">
-                <i class="fa fa-calendar"></i>
+                <i class="fa fa-chart-line"></i>
                     Laporan Voucher 
                 </h4>
             </div>
@@ -46,7 +45,7 @@
                                         @foreach ($brands as $brand)
                                             <option 
                                                 {{ request()->brand == $brand->id ? 'selected' : '' }}
-                                            value="{{ $brand->id }}">{{ $brand->nama }}</option>
+                                            value="{{ $brand->id }}">{{ $brand->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -58,8 +57,8 @@
                                         <option>Semua</option>
                                         @foreach ($types as $type)
                                             <option 
-                                                {{ request()->tipe == $type->id ? 'selected' : '' }}
-                                            value="{{ $type->id }}">{{ $type->nama }}</option>
+                                                {{ request()->type == $type->id ? 'selected' : '' }}
+                                            value="{{ $type->id }}">{{ $type->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -71,8 +70,8 @@
                                         <option value="">Semua</option>
                                         @foreach ($products as $product)
                                             <option
-                                            {{ request()->produk == $product->id ? 'selected' : '' }}
-                                            value="{{ $product->id }}">{{ $product->nama }}</option>
+                                            {{ request()->product == $product->id ? 'selected' : '' }}
+                                            value="{{ $product->id }}">{{ $product->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -86,7 +85,7 @@
                                         @foreach ($suppliers as $supplier)
                                             <option
                                                 {{ request()->supplier == $supplier->id ? 'selected' : '' }}
-                                            value="{{ $supplier->id }}">{{ $supplier->nama }}</option>
+                                            value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -100,7 +99,7 @@
                                         @foreach ($users as $user)
                                             <option 
                                                 {{ request()->kasir == $user->id ? 'selected' : '' }}
-                                            value="{{ $user->id }}">{{ $user->nama }}</option>
+                                            value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -114,7 +113,7 @@
                                         @foreach ($users as $user)
                                             <option 
                                                 {{ request()->aktivator == $user->id ? 'selected' : '' }}
-                                            value="{{ $user->id }}">{{ $user->nama }}</option>
+                                            value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -224,18 +223,18 @@
                                                 #{{ $voucher->id  }}
                                             </td>
                                             <td>
-                                                Layanan : {{ Str::replaceFirst('Aktivasi', '', $voucher->product_name) }} <br>
-                                                Kategori : {{ $voucher->kategori->nama }} <br />
-                                                Brand : {{ $voucher->brand->nama }}
+                                                Layanan : {{ Str::replaceFirst('Aktivasi', '', $voucher->product->name) }} <br>
+                                                Kategori : {{ $voucher->category->name }} <br />
+                                                Brand : {{ $voucher->brand->name }}
                                             </td>
                                             <td>
-                                                {{ $voucher->nomor }}
+                                                {{ $voucher->target }}
                                             </td>
                                             <td>
                                                  
-                                                <span class="badge bg-primary">Beli Rp {{ number_format($voucher->harga_beli, 0, ',', '.') }}</span>
+                                                <span class="badge bg-primary">Beli Rp {{ number_format($voucher->price_sell, 0, ',', '.') }}</span>
                                                 <br>
-                                                <span class="badge bg-success">Jual Rp {{ number_format($voucher->harga_jual, 0, ',', '.') }}</span>
+                                                <span class="badge bg-success">Jual Rp {{ number_format($voucher->price_buy, 0, ',', '.') }}</span>
                                             </td>
                                             <td>
                                                 {{ $voucher->created_at }}
@@ -243,7 +242,8 @@
                                             <td>
                                                 {{-- input-group --}}
                                                 <div class="input-group">
-                                                    <select class="form-control">
+                                                    <select class="form-control" 
+                                                        onchange="handleStatus(this, {{ $voucher->id }})">
                                                         <option 
                                                             {{ $voucher->status == 'sukses' ? 'selected' : '' }}
                                                         value="sukses">Sukses</option>
@@ -286,17 +286,17 @@
 </div>
 <!-- end row -->
 <div class="modal fade" id="modal-detail" tabindex="-1" role="dialog" aria-labelledby="topupDetail" aria-hidden="true">
-    <div class="modal-dialog modal-full-width modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="topupDetail">
                     <i class="ri-information-line"></i>
-                    Detail Pesanan
+                    Detail Transaksi
                 </h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                @include('web.pages.topup.show')
+            <div class="modal-body" id="detail_form">
+         
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close">Tutup</button>
@@ -317,7 +317,7 @@
     });
 </script>
 <script type="text/javascript">
-  function handleDetail (e) {
+     function handleDetail (e) {
         let id = $(e).data('id');
         let url = `{{ route('api.topups.show', ':id') }}`;
         url = url.replace(':id', id);
@@ -325,7 +325,8 @@
             url: url,
             type: "GET",
             data: {
-                topup_id: id
+                topup_id: id,
+                _token: "{{ csrf_token() }}",
             },
             beforeSend: function () {
                 Swal.fire({
@@ -338,103 +339,130 @@
             },
             success: function (response) {
                 $('#modal-detail').modal('show');
-                if(response.data.tipe == "e_wallet") {
-                    let html = `<div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <td style="font-weight:bold">Nama Pelanggan</td>
-                                    <td style="font-weight:bold">Nomor</td>
-                                </tr>
-                                <tr>
-                                    <td>${response.data.detail.nama_pelanggan}</td>
-                                    <td>${response.data.nomor}</td>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>`;
-                    $('#detail_number').html(html);
-                } else if(response.data.tipe == "token_listrik") {
-                    let html = `<div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <td>ID Pelanggan</td>
-                                    <td>Nomor Meter</td>
-                                    <td>Nama Pelanggan</td>
-                                    <td>Segment Power</td>
-                                    <td>Nomor</td>
-                                </tr>
-                                <tr>
-                                    <td>${response.data.detail.id_pelanggan}</td>
-                                    <td>${response.data.detail.nomor_meter}</td>
-                                    <td>${response.data.detail.nama_pelanggan}</td>
-                                    <td>${response.data.detail.segment_power}</td>
-                                    <td>${response.data.nomor}</td>
-                                </tr>
-                            </thead>
+                let html = `
+                <div class="row">
                     
-                        </table>
-                    </div>`;
-                    $('#detail_number').html(html);
+                    `;
+                if(response.data.tipe == "e_wallet" || response.data.tipe == "token_listrik") {
+                html = html + `
+                <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_nomor" class="form-label">Nomor</label>
+                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.target}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_name_pelanggan" class="form-label">Nama Pelanggan</label>
+                            <input type="text" class="form-control" id="detail_name_pelanggan" readonly value="${response.data.detail.customer_name}">
+                        </div>
+                    </div>
+                    
+                    `;
                 } else {
-                    $('#detail_number').html(`<div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                
-                                    <td style="font-weight:bold">Nomor</td>
-                                </tr>
-                                <tr>
-                                  
-                                    <td>${response.data.nomor}</td>
-                                </tr>
-                            </thead>
-
-                        </table>
-                    </div>`);
+                    html = html + `
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <label for="detail_nomor" class="form-label">Nomor</label>
+                            <input type="text" class="form-control" id="detail_nomor" readonly value="${response.data.target}" readonly>
+                        </div>
+                    </div>
+                    `;
                 }
-                $('#detail_product').html(response.data.produk);
-                $('#detail_price').html(`<span class="badge bg-success">${response.data.harga}</span>`);
-                $('#detail_sn').html(response.data.keterangan);
-                $('#detail_status').html(response.data.status);
-                $('#detail_date').html(response.data.tgl_transaksi);
-                $('#detail_whatsapp').html(`<a href="https://wa.me/${response.data.whatsapp}" nomor="_blank" class="btn btn-success btn-sm">
-                        <i class="ri-whatsapp-fill"></i>
-                        Kirim Pesan
-                    </a>`);
-                $('#detail_logs').html('');
-                $.each(response.data.logs, function (index, value) {
-                    $('#detail_logs').append(`
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td colspan="2">${value.supplier}</td>
-                            <td>${value.message}</td>
-                            <td>${value.date}</td>
-                            <td>
-                                <div class="input-group">
-                                    <select class="form-control" name="status" onchange="handleApiStatus(this, '${value.id}')">
-                                        <option 
-                                            ${value.status == 'sukses' ? 'selected' : ''}
-                                        value="sukses">Sukses</option>
-                                        <option 
-                                            ${value.status == 'pending' ? 'selected' : ''}
-                                        value="pending">Pending</option>
-                                        <option 
-                                            ${value.status == 'gagal' ? 'selected' : ''}
-                                        value="gagal">Gagal</option>
-                                    </select>
-                                    <button class="btn btn-primary" type="button">
-                                        <i class="fa fa-caret-down"></i>
-                                    </button>
-                                </div>
+                html = html + `
+                <div class="col-lg-6">
+                    <div class="mb-3">
+                        <label for="detail_product" class="form-label">Produk</label>
+                        <input type="text" class="form-control" id="detail_product" readonly value="${response.data.product}">
+                    </div>
+                </div>
+                   
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_harga" class="form-label">Harga</label>
+                            <input type="text" class="form-control" id="detail_harga" readonly value="${response.data.price_sell}">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_keterangan" class="form-label">Keterangan</label>
+                            <input type="text" class="form-control" id="detail_keterangan" readonly value="${response.data.note}">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="detail_status" class="form-label">Status</label>
+                            <input type="text" class="form-control" id="detail_status" readonly value="${response.data.status}">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="detail_tgl_transaksi" class="form-label">Tgl Transaksi</label>
+                            <input type="datetime" class="form-control" id="detail_tgl_transaksi" readonly value="${response.data.transacted_at}">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_whatsapp" class="form-label">Nomor Whatsapp</label>
+                            <input type="number" class="form-control" id="detail_whatsapp" readonly value="${response.data.whatsapp}">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="detail_kasir" class="form-label">Kasir</label>
+                            <input type="text" class="form-control" id="detail_kasir" readonly value="${response.data.cashier}">
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <span>
+                            <i class="fa fa-list"></i>
+                            Daftar Aksi Topup
+                        </span>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th width="10%">No</th>
+                                <th>Supplier</th>
+                                <th>Keterangan</th>
+                                <th>Waktu</th>
+                                <th>Status</th>
+                                <th>Pembuat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail_logs">
+                        `
+                        $.each(response.data.logs, function (index, value) {
+                            html = html + `
+                            <tr>
+                                <td>
+                                    ${index + 1}
+                                <td>
+                                    ${value.supplier}
                                 </td>
-                            <td>
-                                ${value.cashier ? value.cashier : '-'}
-                            </td>
-                        </tr>
-                    `);
-                });
+                                <td>
+                                    ${value.note}
+                                </td>
+                                <td>
+                                    ${value.created_at}
+                                </td>
+                                <td>
+                                    ${value.status}
+                                </td>
+                                <td>
+                                    ${value.user}
+                                </td>
+                            </tr>
+                            `;
+                        });
+                        html = html + `
+                        </tbody>
+                    </table>
+                    </div>
+                    </div>
+                </div>`;
+                
+                $('#detail_form').html(html);
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 Swal.fire({
@@ -449,7 +477,8 @@
         });
     }
 
-    function handleStatus (e, id) {
+
+  function handleStatus (e, id) {
         let status = $(e).val();
         let url = `{{ route('api.topups.updateStatus', ':id') }}`;
         url = url.replace(':id', id);
@@ -582,7 +611,7 @@
             const type = document.querySelector('select[name="type"]').value;
             const activator = document.querySelector('select[name="activator"]').value;
 
-            window.location.href = `{{ route('admin.vouchers.index') }}?search=${search}&start=${start}&end=${end}&status=${status}&produk=${product}&kasir=${cashier}&supplier=${supplier}&brand=${brand}&tipe=${type}&aktivator=${activator}`;
+            window.location.href = `{{ route('admin.vouchers.index') }}?search=${search}&start=${start}&end=${end}&status=${status}&product=${product}&kasir=${cashier}&supplier=${supplier}&brand=${brand}&type=${type}&aktivator=${activator}`;
         }
 
        $('.select-2').on('change', function() {

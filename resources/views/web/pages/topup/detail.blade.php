@@ -46,8 +46,8 @@
                         </div>
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
-                                <label for="produk">Nama Produk</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->produk->nama}}" readonly>
+                                <label for="product">Nama Produk</label>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->product->name}}" readonly>
                             </div>
                         </div>           
                         <div class="col-lg-6 mb-3">
@@ -55,41 +55,41 @@
                                 <label for="harga">Harga</label>
                                 <input type="text" class="form-control form-control-md" 
                                 autofocus="true"
-                                value="Rp {{number_format($topup->harga_jual, 0, ',', '.')}}" readonly>
+                                value="Rp {{number_format($topup->price_sell, 0, ',', '.')}}" readonly>
                             </div>
                         </div>             
                         @if($topup->tipe == 'e_wallet')
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
-                                <label for="nama_pelanggan">Nama Pelanggan</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->e_wallet->nama_pelanggan}}" readonly>
+                                <label for="customer_name">Nama Pelanggan</label>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->e_wallet->customer_name}}" readonly>
                             </div>
                         </div>
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
                                 <label for="nomor">Nomor</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->nomor}}" readonly>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->target}}" readonly>
                             </div>
                         </div>
                         @elseif($topup->tipe == 'token_listrik')
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
                                 <label for="id_pelanggan">ID Pelanggan</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->id_pelanggan}}" readonly>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->subscriber_id}}" readonly>
                             </div>
                         </div>
                         {{-- nomor_meter --}}
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
                                 <label for="nomor_meter">Nomor Meter</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->nomor_meter}}" readonly>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->meter_no}}" readonly>
                             </div>
                         </div>
                         {{-- nama_pelanggan --}}
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
                                 <label for="nama_pelanggan">Nama Pelanggan</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->nama_pelanggan}}" readonly>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->token_listrik->customer_name}}" readonly>
                             </div>
                         </div>
                         {{-- segment_power --}}
@@ -103,7 +103,7 @@
                         <div class="col-lg-6 mb-3">
                             <div class="form-group">
                                 <label for="nomor">Nomor</label>
-                                <input type="text" class="form-control form-control-md" value="{{$topup->nomor}}" readonly>
+                                <input type="text" class="form-control form-control-md" value="{{$topup->target}}" readonly>
                             </div>
                         </div>
                         @endif

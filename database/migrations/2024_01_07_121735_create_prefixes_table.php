@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prefix', function (Blueprint $table) {
+        Schema::create('prefixs', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
             $table->unsignedInteger('brand_id');
-            $table->string('nomor', 5);
+            $table->string('number', 5);
             $table->timestamps();
-            $table->foreign('brand_id')->references('id')->on('brand')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade')->onUpdate('cascade');
         });
-        DB::statement('ALTER TABLE prefix MODIFY id INT(3) UNSIGNED NOT NULL AUTO_INCREMENT');
-        DB::statement('ALTER TABLE prefix MODIFY brand_id INT(4) UNSIGNED NOT NULL');
+        DB::statement('ALTER TABLE prefixs MODIFY id INT(3) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE prefixs MODIFY brand_id INT(4) UNSIGNED NOT NULL');
     }
 
     /**
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prefix');
+        Schema::dropIfExists('prefixs');
     }
 };

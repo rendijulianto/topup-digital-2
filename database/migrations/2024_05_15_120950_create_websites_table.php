@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('website', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->string('nama', 50);
-            $table->string('alamat', 50);
-            $table->string('nomor_telepon', 15);
+            $table->string('name', 50);
+            $table->string('address', 50);
+            $table->string('telp', 15);
             $table->string('logo_website', 50);
             $table->string('logo_print', 50);
             $table->timestamps();

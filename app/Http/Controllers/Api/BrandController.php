@@ -11,14 +11,14 @@ class BrandController extends Controller
     public function getByCategory(Request $request)
     {
         $this->validate($request, [
-            'kategori' => 'required|exists:kategori,nama',
+            'category' => 'required|exists:categories,name',
         ]);
-        
-        $brands = Brand::select('id', 'nama','logo')
-        ->category($request->kategori)
+    
+        $brands = Brand::select('id', 'name','logo')
+        ->category($request->category)
         ->withCount('topup')
         ->orderByDesc('topup_count')
-        ->orderBy('nama', 'asc')->get();
+        ->orderBy('name', 'asc')->get();
         return response()->json([
             'status' => true,
             'message' => 'Data berhasil diambil',

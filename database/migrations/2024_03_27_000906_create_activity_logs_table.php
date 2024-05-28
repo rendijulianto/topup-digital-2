@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('log_aktivitas', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->unsignedInteger('pengguna_id');
+            $table->unsignedInteger('user_id');
             $table->ipAddress('ip');
-            $table->string('keterangan', 255);
+            $table->string('note', 255);
             $table->string('user_agent', 150);
             $table->timestamps();
-            $table->foreign('pengguna_id')->references('id')->on('pengguna')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
-        DB::statement('ALTER TABLE log_aktivitas MODIFY pengguna_id INT(3) UNSIGNED NOT NULL');
+        DB::statement('ALTER TABLE activity_logs MODIFY user_id INT(3) UNSIGNED NOT NULL');
     }
 
     /**
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('log_aktivitas');
+        Schema::dropIfExists('activity_logs');
     }
 };

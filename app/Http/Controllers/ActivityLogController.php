@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LogAktivitas;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
-use App\Models\{CekNama, CekVoucher, Brand};
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class ActivityLogController extends Controller
 {
@@ -23,7 +21,7 @@ class ActivityLogController extends Controller
             $request->end = $end->format('Y-m-d');
         }
 
-        $logs = LogAktivitas::search($request)
+        $logs = ActivityLog::search($request)
             ->latest()
             ->paginate(config('app.pagination.default'));
 

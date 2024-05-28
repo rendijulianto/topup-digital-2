@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
-use App\Models\LogAktivitas;
+use App\Models\ActivityLog;
 class BrandController extends Controller
 {
     /**
@@ -12,7 +12,7 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = Brand::search($request)->orderBy('nama', 'asc')->paginate(config('app.pagination.default'));
+        $brands = Brand::search($request)->orderBy('name', 'asc')->paginate(config('app.pagination.default'));
 
         return view('web.pages.brand.index', compact('brands'));
     }
@@ -32,13 +32,13 @@ class BrandController extends Controller
     {
       
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:brand,nama'],
+            'name' => ['required','string','max:255','unique:brands,name'],
             'logo' => ['required','image','max:2048','mimes:jpg,jpeg,png,webp'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
             'logo.required' => 'Logo tidak boleh kosong!',
             'logo.image' => 'Logo harus berupa gambar!',
             'logo.max' => 'Logo maksimal 2MB!',
@@ -48,18 +48,18 @@ class BrandController extends Controller
 
         try {
 
-            $logo_nama = time() . '.'.$request->file('logo')->getClientOriginalExtension();
-            $request->file('logo')->move('brands', $logo_nama);
+            $logo_name = time() . '.'.$request->file('logo')->getClientOriginalExtension();
+            $request->file('logo')->move('brands', $logo_name);
         
             // Simpan brand
             Brand::create([
-                'nama' => $request->nama,
-                'logo' => $logo_nama,
+                'name' => $request->name,
+                'logo' => $logo_name,
             ]);
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menambahkan brand baru dengan nama '.$request->nama,
+                'note' => 'Menambahkan brand baru dengan name '.$request->name,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([
@@ -89,13 +89,13 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         $this->validate($request, [
-            'nama' => ['required','string','max:255','unique:brand,nama,' . $brand->id],
+            'name' => ['required','string','max:255','unique:brands,name,' . $brand->id],
             'logo' => ['nullable','image','max:2048','mimes:jpg,jpeg,png'],
         ], [
-            'nama.required' => 'Nama tidak boleh kosong!',
-            'nama.string' => 'Nama harus berupa string!',
-            'nama.max' => 'Nama maksimal 255 karakter!',
-            'nama.unique' => 'Nama sudah terdaftar!',
+            'name.required' => 'Nama tidak boleh kosong!',
+            'name.string' => 'Nama harus berupa string!',
+            'name.max' => 'Nama maksimal 255 karakter!',
+            'name.unique' => 'Nama sudah terdaftar!',
             'logo.image' => 'Logo harus berupa gambar!',
             'logo.max' => 'Logo maksimal 2MB!',
             'logo.mimes' => 'Logo harus berupa JPG, JPEG, atau PNG!',
@@ -109,25 +109,25 @@ class BrandController extends Controller
                     unlink(public_path("brands/{$brand->logo}"));
                 }
                 
-                $logo_nama = time() . '.'.$request->file('logo')->getClientOriginalExtension();
-                $request->file('logo')->move('brands', $logo_nama);
+                $logo_name = time() . '.'.$request->file('logo')->getClientOriginalExtension();
+                $request->file('logo')->move('brands', $logo_name);
         
                 // Update brand
                 $brand->update([
-                    'nama' => $request->nama,
-                    'logo' => $logo_nama,
+                    'name' => $request->name,
+                    'logo' => $logo_name,
                 ]);
             } else {
                 // Update brand tanpa logo
                 $brand->update([
-                    'nama' => $request->nama,
+                    'name' => $request->name,
                 ]);
             }
 
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Mengubah brand dengan id '.$brand->id,
+                'note' => 'Mengubah brand dengan id '.$brand->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            
@@ -153,10 +153,10 @@ class BrandController extends Controller
                 unlink(public_path("brands/{$brand->logo}"));
             }
             $brand->delete();
-            LogAktivitas::create([
-                'pengguna_id' => auth()->guard('pengguna')->user()->id,
+            ActivityLog::create([
+                'user_id' => auth()->guard()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Menghapus brand dengan id '.$brand->id,
+                'note' => 'Menghapus brand dengan id '.$brand->id,
                 'user_agent' => $request->header('User-Agent'),
             ]);
            return response()->json([

@@ -36,7 +36,7 @@
                                         @foreach ($brands as $brand)
                                             <option 
                                                 {{ request()->brand == $brand->id ? 'selected' : '' }}
-                                            value="{{ $brand->id }}">{{ $brand->nama }}</option>
+                                            value="{{ $brand->id }}">{{ $brand->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -48,8 +48,8 @@
                                         <option>Semua</option>
                                         @foreach ($categories as $category)
                                             <option 
-                                                {{ request()->kategori == $category->id ? 'selected' : '' }}
-                                            value="{{ $category->id }}">{{ $category->nama }}</option>
+                                                {{ request()->category == $category->id ? 'selected' : '' }}
+                                            value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -61,8 +61,8 @@
                                         <option>Semua</option>
                                         @foreach ($types as $type)
                                             <option 
-                                                {{ request()->tipe == $type->id ? 'selected' : '' }}
-                                            value="{{ $type->id }}">{{ $type->nama }}</option>
+                                                {{ request()->type == $type->id ? 'selected' : '' }}
+                                            value="{{ $type->id }}">{{ $type->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -75,7 +75,7 @@
                                         @foreach ($suppliers as $supplier)
                                             <option
                                                 {{ request()->supplier == $supplier->id ? 'selected' : '' }}
-                                            value="{{ $supplier->id }}">{{ $supplier->nama }}</option>
+                                            value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                                         @endforeach
                                     </select>
 
@@ -91,7 +91,7 @@
                                             {{ request()->status == 1 ? 'selected' : '' }}
                                         value="1">Aktif</option>
                                         <option 
-                                            {{ request()->status == 0 ? 'selected' : '' }}
+                                            {{ request()->status == "0" ? 'selected' : '' }}
                                         value="0">Tidak Aktif</option>
                                        
                                     </select>
@@ -132,58 +132,31 @@
                                             <td class="d-flex align-items-center">
                                                 <img src="{{$product->brand->logo_url}}" alt="" width="50px" class="me-2"> <br>
                                                 <div>
-                                                    Nama : {{$product->nama}} <br>
-                                                    Brand : {{$product->brand->nama}} <br>
-                                                    Kategori : {{$product->kategori->nama}} <br>
-                                                    Tipe : {{$product->tipe->nama}} <br>
+                                                    Nama : {{$product->name}} <br>
+                                                    Brand : {{$product->brand->name}} <br>
+                                                    Kategori : {{$product->category->name}} <br>
+                                                    Tipe : {{$product->type->name}} <br>
                                                 </div>
                                             </td>
-                                            <td>Rp. {{number_format($product->harga,0,',','.')}}</td>
+                                            <td>Rp. {{number_format($product->price,0,',','.')}}</td>
                                             <td>
-                                                {{$product->deskripsi}}
+                                                {{$product->description}}
                                             </td>
                                             <td>
                                                 <ul class="">
-                                                    @foreach ($product->supplier_produk as $detail)
+                                            
+                                                    @foreach ($product->product_suppliers as $detail)
                                                         <li>
                                                             <span class="badge bg-{{$detail->status == 1 ? 'success' : 'danger' }} rounded-pill">
-                                                                {{$detail->supplier->nama}}</span>
-                                                                {{-- {{$detail->supplier->nama}}</span>   <a href="#" style="size: 10px; color: red;"
-                                                                data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Hapus Supplier Dari Produk"
-                                                                    <i class="fa fa-close"></i></a>
-                                                            <br>
-                                                             
-                                                             <span class="badge bg-primary rounded-pill">Harga : Rp. {{number_format($detail->harga,0,',','.')}}</span>
-                                                            <br>
-                                                            @if($detail->stok == 999999)
-                                                                <span class="badge bg-success rounded-pill">Stok : Unlimited</span>
-                                                            @else
-                                                                <span class="badge bg-danger rounded-pill">Stok : {{$detail->stok}}</span>
-                                                            @endif
-                                                            @if($detail->multi == 1)
-                                                                <span class="badge bg-success rounded-pill">Multi : Ya</span>
-                                                            @else
-                                                                <span class="badge bg-danger rounded-pill">Multi : Tidak</span>
-                                                            @endif
-                                                            <br>
-                                                            <span class="badge bg-danger rounded-pill" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                            data-bs-title="Jam Tutup Supplier">
-                                                                <i class="fa fa-clock"></i>
-                                                                {{$detail->jam_buka}} - {{$detail->jam_tutup}} 
-                                                            </span> <br>
-                                                            <br> --}}
+                                                                {{$detail->supplier->name}}</span>
+                                                        
                                                          
                                                         </li>
                                                     @endforeach
                                                 </ul>
                                             </td>
                                             <td>
-                                                @if($product->tipe->nama == "Custom")
-                                                    <a href="{{route('admin.products.custom-profit.edit', $product->id)}}" class="btn btn-info btn-sm"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Kelola Harga Khusus"
-                                                        ><i class="fa fa-dollar"></i>
-                                                    </a>
-                                                @endif
+                                           
                                                 <a href="{{route('admin.products.supplier.index',$product->id)}}" class="btn btn-success btn-sm"
                                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Kelola Supplier Produk"
                                                     ><i class="ri-store-2-line"></i>
@@ -280,7 +253,7 @@
             const search = document.querySelector('input[type="text"]').value;
             
 
-            window.location.href = `{{ route('admin.products.index') }}?brand=${brand}&kategori=${category}&tipe=${type}&supplier=${supplier}&status=${status}&search=${search}`;
+            window.location.href = `{{ route('admin.products.index') }}?brand=${brand}&category=${category}&type=${type}&supplier=${supplier}&status=${status}&search=${search}`;
         }
 
        $('.select-2').on('change', function() {

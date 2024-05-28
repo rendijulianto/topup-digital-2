@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CekNama extends Model
+class NameCheck extends Model
 {
     use HasFactory;
 
-    protected $table = 'cek_nama';
+    protected $table = 'name_checks';
 
     protected $fillable = [
         'ref_id',
         'brand_id',
-        'nomor',
-        'nama',
+        'target',
+        'name',
         'status',
     ];
 }

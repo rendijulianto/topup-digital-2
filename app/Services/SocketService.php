@@ -14,6 +14,7 @@ class SocketService
                 'data' => [
                     'id' => $topup->id,
                     'status' => $topup['status_html'],
+                    'message' => $topup['message'],
                     'date' => date('Y-m-d H:i:s'),
                     'nomor' => $topup->nomor,
                     'produk' => $topup->product_name,
@@ -23,7 +24,7 @@ class SocketService
                 ]
             ];
             $topup = json_encode($data);
-            $url = config('app.url_socket').'/update-topup';
+            $url = config('app.url_socket').'/trigger';
             $ch = curl_init();
             $headers = [
                 'Content-Type: application/json',

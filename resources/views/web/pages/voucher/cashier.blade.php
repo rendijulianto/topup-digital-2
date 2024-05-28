@@ -38,13 +38,13 @@
                         <input type="hidden" name="id_voucher" id="id_voucher">
                         <tr>
                             <th>Produk</th>
-                            <td id="produk">
+                            <td id="product">
                                 -
                             </td>
                         </tr>
                         <tr>
                             <th>Harga</th>
-                            <td id="harga">
+                            <td id="price">
                                 -
                             </td>
                         </tr>
@@ -59,15 +59,15 @@
                             <th>
                                 Tanggal Dibuat
                             </th>
-                            <td id="tanggal_dibuat">
+                            <td id="created_at">
                                 -
                             </td>
                         </tr>
                         <tr>
                             <th>
-                                Tanggal Kadaluarsa
+                                Tanggal Expired
                             </th>
-                            <td id="tanggal_kadaluarsa">
+                            <td id="expired_at">
                                 -
                             </td>
                         </tr>
@@ -106,14 +106,14 @@
             success: function(response) {
                 if (response.status == true) {   
                     $('#id_voucher').val(response.data.id);
-                    $('#produk').html(response.data.nama_produk);
-                    $('#harga').html(response.data.harga);
+                    $('#product').html(response.data.name);
+                    $('#price').html(response.data.price_sell);
                     $('#status_voucher').html(`
                     <span class="badge bg-${response.data.status == 'Sudah Terjual' ? 'danger' : 'success'}">${response.data.status}</span>
                     `);
-                    $('#tanggal_terjual').html(response.data.tanggal_terjual);
-                    $('#tanggal_dibuat').html(response.data.tanggal_dibuat);
-                    $('#tanggal_kadaluarsa').html(response.data.tanggal_kadaluarsa);
+                    $('#transacted_at').html(response.data.transacted_at);
+                    $('#created_at').html(response.data.created_at);
+                    $('#expired_at').html(response.data.expired_at);
                     if (response.data.status == 'Sudah Terjual') {
                         $('#btn-beli').prop('disabled', true);
                     } else {
@@ -138,6 +138,72 @@
         });
     }
 
+    const handleSell = () => {
+        Swal.fire({
+            title: 'Beli Voucher',
+            text: 'Apakah anda yakin ingin membeli voucher ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Beli Sekarang',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let id_voucher = $('#id_voucher').val();
+                let url = "{{route('api.topups.sellVoucher',':id_voucher')}}";
+                url = url.replace(':id_voucher', id_voucher);
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        _token: "{{csrf_token()}}",
+                        pin: $('#pin').val()
+                    },
+                    success: function(response) {
+                        if (response.status == true) {
+                            Swal.fire({
+                                title: 'Berhasil',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function(response) {
+                        if (response.status == 422) {
+                            let errors = response.responseJSON.errors;
+                            let message = '';
+                            for (const key in errors) {
+                                message += errors[key] + '<br>';
+                            }
+                        } else if (response.status == 401) {
+                            Swal.fire({
+                                title: 'Oops!',
+                                text:  response.responseJSON.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan saat memproses data, silahkan coba lagi.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }      
     $(document).ready(function() {
         $('form').submit(function(e) {
             e.preventDefault();
@@ -146,73 +212,6 @@
 
         $('input').attr('autocomplete', 'off');
         $('input').focus();
-
-        const handleSell = () => {
-            Swal.fire({
-                title: 'Beli Voucher',
-                text: 'Apakah anda yakin ingin membeli voucher ini?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Beli Sekarang',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let id_voucher = $('#id_voucher').val();
-                    let url = "{{route('api.topups.sellVoucher',':id_voucher')}}";
-                    url = url.replace(':id_voucher', id_voucher);
-                    $.ajax({
-                        url: url,
-                        type: "POST",
-                        data: {
-                            _token: "{{csrf_token()}}",
-                            pin: $('#pin').val()
-                        },
-                        success: function(response) {
-                            if (response.status == true) {
-                                Swal.fire({
-                                    title: 'Berhasil',
-                                    text: response.message,
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                }).then((result) => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Gagal',
-                                    text: response.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        },
-                        error: function(response) {
-                            if (response.status == 422) {
-                                let errors = response.responseJSON.errors;
-                                let message = '';
-                                for (const key in errors) {
-                                    message += errors[key] + '<br>';
-                                }
-                            } else if (response.status == 401) {
-                                Swal.fire({
-                                    title: 'Oops!',
-                                    text:  response.responseJSON.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Gagal',
-                                    text: 'Terjadi kesalahan saat memproses data, silahkan coba lagi.',
-                                    icon: 'error',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-        }      
     });
 </script>
 @endsection

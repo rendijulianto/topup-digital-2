@@ -3,9 +3,9 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label for="nama" class="form-label">Nama Lengkap</label>
-                                <input type="text" name="nama" id="nama" class="form-control @error('nama') is-invalid @enderror" placeholder="Masukkan nama"
-                                value="{{old('nama')}}">
+                                <label for="name" class="form-label">Nama Lengkap</label>
+                                <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" placeholder="Masukkan name"
+                                value="{{old('name')}}">
                                 <small class="text-danger"></small>
                             </div>
                         </div>
@@ -27,11 +27,11 @@
                         </div>
                         <div class="col-lg-6">
                             <div class="mb-3">
-                                <label for="jabatan" class="form-label">Level</label>
-                                <select name="jabatan" id="jabatan" class="form-control @error('jabatan') is-invalid @enderror">
-                                    <option value="">Pilih jabatan</option>
-                                    <option value="admin" {{old('jabatan') == 'admin' ? 'selected' : ''}}>Admin</option>
-                                    <option value="kasir" {{old('jabatan') == 'kasir' ? 'selected' : ''}}>Kasir</option>
+                                <label for="role" class="form-label">Level</label>
+                                <select name="role" id="role" class="form-control @error('role') is-invalid @enderror">
+                                    <option value="">Pilih role</option>
+                                    <option value="admin" {{old('role') == 'admin' ? 'selected' : ''}}>Admin</option>
+                                    <option value="kasir" {{old('role') == 'kasir' ? 'selected' : ''}}>Kasir</option>
                                 </select>
                                 <small class="text-danger"></small>
                             </div>
@@ -51,9 +51,9 @@
 
 <script>
     $(document).ready(function() {
-       $('#jabatan').on('change', function() {
-           let jabatan = $(this).val();
-           if (jabatan == 'kasir') {
+       $('#role').on('change', function() {
+           let role = $(this).val();
+           if (role == 'kasir') {
                $('#input_pin').removeClass('d-none');
            } else {
                 $('#input_pin').addClass('d-none');

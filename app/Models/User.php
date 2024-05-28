@@ -5,43 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Model;
 
-class Pengguna extends Model
+class User extends Model
 {
     use HasFactory;
 
     // Your model implementation
     
+    protected $table = 'users';
 
     protected $guarded = ['id'];
-
-    public function getAuthIdentifierName()
-    {
-        return 'id'; // Replace 'id' with the name of your primary key column
-    }
-
-    public function getAuthIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getAuthPassword()
-    {
-        return $this->password;
-    }
-    
-
-    // table name
-    protected $table = 'pengguna';
 
     // primary key
     protected $primaryKey = 'id';
 
     // fillable attrib
     protected $fillable = [
-        'nama',
+        'name',
         'email',
         'password',
-        'jabatan',
+        'role',
         'token'
     ];
 
@@ -54,14 +36,14 @@ class Pengguna extends Model
     public function scopeSearch($query, $request)
     {
         if ($request->search){
-            $query->where('nama', 'like', '%' . $request->search . '%')
+            $query->where('name', 'like', '%' . $request->search . '%')
                 ->orWhere('email', 'like', '%' . $request->search . '%')
-                ->orWhere('jabatan', 'like', '%' . $request->search . '%');
+                ->orWhere('role', 'like', '%' . $request->search . '%');
         }
 
-        // jabatan
-        if ($request->has('jabatan') && $request->jabatan != 'Semua') {
-            $query->where('jabatan', $request->jabatan);
+        // role
+        if ($request->has('role') && $request->role != 'Semua') {
+            $query->where('role', $request->role);
         }
 
         return $query;
@@ -70,6 +52,6 @@ class Pengguna extends Model
 
     public function pin()
     {
-        return $this->hasOne(PenggunaPin::class, 'pengguna_id', 'id');
+        return $this->hasOne(UserPin::class, 'user_id', 'id');
     }
 }

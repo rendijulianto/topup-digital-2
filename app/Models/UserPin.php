@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PenggunaPin extends Model
+class UserPin extends Model
 {
     use HasFactory;
 
-    protected $table = 'pengguna_pin';
+    protected $table = 'user_pin';
 
     protected $fillable = [
-        'pengguna_id',
+        'user_id',
         'pin',
     ];
 }

@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CekVoucher extends Model
+class VoucherCheck extends Model
 {
     use HasFactory;
 
-    protected $table = 'cek_voucher';
+    protected $table = 'voucher_checks';
 
     protected $fillable = [
         'ref_id',
-        'nomor',
-        'keterangan',
+        'target',
+        'note',
         'status',
         'brand_id'
     ];

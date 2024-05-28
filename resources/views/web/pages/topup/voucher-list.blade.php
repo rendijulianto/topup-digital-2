@@ -110,19 +110,19 @@
                $('button[type=submit]').html(`<i class="fa fa-spinner fa-spin"></i> Memeriksa...`)
            },
            data: {
-               nomor: kode,
+               target: kode,
                brand: `{{$brand}}`,
                 brand_id: brand_id
            },
            success: function(response) {
                 if(response.status === true){
-                    $('#product_name').text(response.data.voucher.produk);
+                    $('#product_name').text(response.data.voucher.product);
                     $('#histories').empty();
-                    response.data.riwayat.forEach((history, index) => {
+                    response.data.histories.forEach((history, index) => {
                         $('#histories').append(`
                             <tr>
                                 <td>${index + 1}</td>
-                                <td>${history.keterangan}</td>
+                                <td>${history.note}</td>
                                 <td>${history.created_at}</td>
                             </tr>
                         `);
@@ -136,6 +136,8 @@
                         </tr>
                     `);	
                 }
+                // Swal  stop
+                Swal.close();
            },
            error: function(error) {
                 //    jika error status kode 422
@@ -152,10 +154,12 @@
                         icon: 'error'
                     });
                 } else if (error.status === 422) {
-                    Swal.fire({
-                        title: 'Silahkan masukkan kode voucher',
-                        icon: 'error'
-                    });
+                //    pesan error validate laravel 
+                Swal.fire({
+                    title: 'Terjadi kesalahan',
+                    icon: 'error',
+                    html: error.responseJSON.message
+                });
                 } else {
                     Swal.fire({
                         title: 'Terjadi kesalahan',
@@ -164,7 +168,7 @@
                 }
            },
            complete: function() {
-                Swal.close();
+        
                 $('button[type=submit]').attr('disabled', false)
                 $('button[type=submit]').html(`<i class="fa fa-search"></i> Cek`)
            }
@@ -182,8 +186,8 @@
                     $('#voucher-list').append(`
                         <tr>
                             <td>${index + 1}</td>
-                            <td>${voucher.nama}</td>
-                            <td>${new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', minimumFractionDigits: 0}).format(voucher.harga)}</td>
+                            <td>${voucher.name}</td>
+                            <td>${new Intl.NumberFormat('id-ID', {style: 'currency', currency: 'IDR', minimumFractionDigits: 0}).format(voucher.price)}</td>
                         </tr>
                     `);
                     brand_id = voucher.brand_id;

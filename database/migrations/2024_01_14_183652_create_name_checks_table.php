@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cek_nama', function (Blueprint $table) {
+        Schema::create('name_checks', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
             $table->string('ref_id', 20)->unique();
-            $table->string('nomor', 15);
-            $table->string('nama', 150);
+            $table->string('target', 15);
+            $table->string('name', 150);
             $table->unsignedInteger('brand_id');
             $table->enum('status', ['sukses', 'gagal', 'pending'])->default('pending');
             $table->timestamps();
-            $table->foreign('brand_id')->references('id')->on('brand')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cek_nama');
+        Schema::dropIfExists('name_checks');
     }
 };

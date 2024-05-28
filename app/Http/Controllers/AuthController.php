@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Pengguna;
+use App\Models\User;
 use Illuminate\Support\Str;
 use App\Mail\ResetPasswordMail;
-use App\Models\LogAktivitas;
+use App\Models\ActivityLog;
 class AuthController extends Controller
 {
 
@@ -23,8 +23,8 @@ class AuthController extends Controller
             'email' => 'required|max:191',
             'password' => 'required|min:6|max:191',
         ], [
-            'email.required' => 'Nama pengguna tidak boleh kosong!',
-            'email.max' => 'Nama pengguna terlalu panjang!',
+            'email.required' => 'Email tidak boleh kosong!',
+            'email.max' => 'Email terlalu panjang!',
             'password.required' => 'Password tidak boleh kosong!',
             'password.min' => 'Password terlalu pendek',
             'password.max' => 'Password terlalu panjang',
@@ -32,18 +32,18 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
     
       
-        if(Auth::guard('pengguna')->attempt($credentials)) {
-            LogAktivitas::create([
-                'pengguna_id' => auth('pengguna')->user()->id,
+        if(Auth::guard()->attempt($credentials)) {
+            ActivityLog::create([
+                'user_id' => auth()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Masuk ke sistem',
+                'note' => 'Masuk ke sistem',
                 'user_agent' => $request->header('User-Agent'),
             ]);
-           if (auth('pengguna')->user()->jabatan == 'admin') {
+           if (auth()->user()->role == 'admin') {
                 return redirect()->route('admin.dashboard');
-            } elseif (auth('pengguna')->user()->jabatan == 'kasir') {
+            } elseif (auth()->user()->role == 'kasir') {
                 return redirect()->route('cashier.dashboard');
-            } elseif (auth('pengguna')->user()->jabatan == 'injector') {
+            } elseif (auth()->user()->role == 'injector') {
                 return redirect()->route('injector.dashboard');
             }
         }	
@@ -64,11 +64,11 @@ class AuthController extends Controller
             'email.email' => 'Email tidak valid!',
             'email.max' => 'Email terlalu panjang!',
         ]);
-        $pengguna = Pengguna::where('email', $request->email)->first();
-        if ($pengguna) {
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
             $token = Str::random(64);
             $newPassword = Str::random(8);
-            $pengguna->update([
+            $user->update([
                 'token' => $token,
             ]);
             $details = [
@@ -76,7 +76,7 @@ class AuthController extends Controller
                 'newPassword' => $newPassword,	
             ];
 
-            \Mail::to($pengguna->email)->send(new ResetPasswordMail($details));
+            \Mail::to($user->email)->send(new ResetPasswordMail($details));
 
             return redirect()->back()->with('success', 'Silahkan cek email anda untuk mereset password!');
         }
@@ -92,9 +92,9 @@ class AuthController extends Controller
             'newPassword.min' => 'Password baru terlalu pendek!',
             'newPassword.max' => 'Password baru terlalu panjang!',
         ]);
-        $pengguna = Pengguna::where('token', $token)->first();
-        if ($pengguna) {
-            $pengguna->update([
+        $user = User::where('token', $token)->first();
+        if ($user) {
+            $user->update([
                 'password' => bcrypt($request->newPassword),
                 'token' => null,
             ]);
@@ -106,14 +106,14 @@ class AuthController extends Controller
     // logout
     public function logout(Request $request)
     {
-        if (auth('pengguna')->check()) {
-            LogAktivitas::create([
-                'pengguna_id' => auth('pengguna')->user()->id,
+        if (auth()->check()) {
+            ActivityLog::create([
+                'user_id' => auth()->user()->id,
                 'ip' => $request->ip(),
-                'keterangan' => 'Keluar dari sistem',
+                'note' => 'Keluar dari sistem',
                 'user_agent' => $request->header('User-Agent'),
             ]);
-            auth('pengguna')->logout();
+            auth()->logout();
         }
         return redirect()->route('login')->with('success', 'Berhasil logout!');
     }

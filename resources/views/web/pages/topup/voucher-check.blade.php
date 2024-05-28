@@ -4,13 +4,6 @@
 <div class="row">
     <div class="col-12">
         <div class="page-title-box">
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">{{config('app.name')}}</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Halaman</a></li>
-                    <li class="breadcrumb-item active"><a href="">Daftar Produk</a></li>
-                </ol>
-            </div>
             <h4 class="page-title">Daftar Produk</h4>
         </div>
     </div>
@@ -28,12 +21,10 @@
                     width="50"
                     alt="" class="img-e-wallet">
                 </div>
-                <label for="" class="mb-2">{{$brand->nama}}</label>
+                <label for="" class="mb-2">{{$brand->number}}</label>
                 <div class="rounded w-100">
                     <button class="btn btn-danger
                     w-100"><i class="fa fa-eye"></i> Lihat Produk</button>
-
-            
                 </div>
             </div>
         </a>

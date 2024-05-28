@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pengguna_pin', function (Blueprint $table) {
+        Schema::create('user_pin', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->unsignedInteger('pengguna_id');
+            $table->unsignedInteger('user_id');
             $table->string('pin', 64);
             $table->timestamps();
-            $table->foreign('pengguna_id')->references('id')->on('pengguna')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
-        DB::statement('ALTER TABLE pengguna_pin MODIFY id INT(3) UNSIGNED NOT NULL AUTO_INCREMENT');
-        DB::statement('ALTER TABLE pengguna_pin MODIFY pengguna_id INT(3) UNSIGNED NOT NULL');
+        DB::statement('ALTER TABLE user_pin MODIFY id INT(3) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE user_pin MODIFY user_id INT(3) UNSIGNED NOT NULL');
     }
 
     /**
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pengguna_pin');
+        Schema::dropIfExists('user_pin');
     }
 };

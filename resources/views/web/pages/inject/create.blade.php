@@ -38,7 +38,7 @@
                                 selected disabled
                                 >Pilih Brand</option>
                                 @foreach ($brands as $brand)
-                                    <option value="{{$brand->id}}">{{$brand->nama}}</option>
+                                    <option value="{{$brand->id}}">{{$brand->name}}</option>
                                 @endforeach
                             </select>
                             @error('brand_id')
@@ -106,7 +106,7 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label for="price_sell" class="form-label"><span class="circle-icon">8</span> Harga Jual</label>
-                            <input type="text" readonly name="price_sell" id="price_sell" class="form-control  @error('tgl_kadaluwarsa') is-invalid @enderror">
+                            <input type="text" readonly name="price_sell" id="price_sell" class="form-control  @error('price_sell') is-invalid @enderror">
                             @error('price_sell')
                                 <div class="invalid-feedback">
                                     {{$message}}
@@ -206,12 +206,12 @@
              
             } else if(dataTopup.data.status.includes('Gagal')) {
                 $('#btnStatus_' + dataTopup.data.id).html(` <button type="button" class="btn btn-sm btn-danger mb-2" data-toggle="modal" 
-                                                data-topup_number="${dataTopup.data.nomor}"
-                                                data-topup_product_name="${dataTopup.data.produk}"
-                                                data-topup_price="Rp ${dataTopup.data.harga}"
+                                                data-topup_number="${dataTopup.data.target}"
+                                                data-topup_product_name="${dataTopup.data.product}"
+                                                data-topup_price="Rp ${dataTopup.data.price}"
                                                 data-topup_id="${dataTopup.data.id}"
-                                                data-topup_customer_name="${dataTopup.data.nama_pelanggan}"
-                                                data-topup_type="${dataTopup.data.tipe}"
+                                                data-topup_customer_name="${dataTopup.data.customer_name}"
+                                                data-topup_type="${dataTopup.data.type}"
                                                 onclick="handleConfirmTopup(this)">
                                                     <i class="fa fa-redo"></i>
                                                   Kirim Ulang
@@ -377,7 +377,7 @@
             type: "GET",
             data: {
                 brand_id: brand_id,
-                kategori_id: '{{$category->id}}'
+                category_id: '{{$category->id}}'
             },
             beforeSend: function() {
                 $('#type_id').html('<option value="" disabled selected>Pilih Tipe</option>')
@@ -392,7 +392,7 @@
                     let html = '';
                     data.types.forEach(element => {
                         html += `<option value="${element.id}">
-                            ${element.nama}
+                            ${element.name}
                             </option>`
                     });
                     $('#type_id').append(html);
@@ -419,7 +419,7 @@
             type: "GET",
             data: {
                 brand_id: brand_id,
-                tipe_id: type_id,
+                type_id: type_id,
             },
             success: function(res) {
                 let data = res.data;
@@ -428,8 +428,8 @@
                 } else {
                     let html = '';
                     data.forEach(element => {
-                        html += `<option value="${element.id}" data-price="${element.harga}">
-                            ${element.nama}
+                        html += `<option value="${element.id}" data-price="${element.price}">
+                            ${element.name}
                             </option>`
                     });
                     $('#product_id').append(html);
@@ -561,18 +561,18 @@
                         data: {
                             brand_id: brand_id,
                             type_id: type_id,
-                            produk_id: product_id,
+                            product_id: product_id,
                             supplier_id: supplier_id,
-                            nomor: element,
+                            target: element,
                             pin: pin,
-                            tgl_kadaluwarsa: tgl_kadaluwarsa,
+                            expired_at: tgl_kadaluwarsa,
                         },
                     });
 
                     let data = res.data;
 
                     html += `<tr>
-                                <td>${data.nomor}</td>
+                                <td>${data.target}</td>
                                 <td>${data.brand}</td>
                                 <td>${data.product}</td>
                                 <td>${data.status} - ${data.message}</td>
@@ -584,7 +584,7 @@
                     if (err.status == 400) {
                         let data = err.responseJSON.data;
                         html += `<tr>
-                                    <td>${data.nomor}</td>
+                                    <td>${data.target}</td>
                                     <td>${data.brand}</td>
                                     <td>${data.product}</td>
                                     <td>${data.status} - ${data.message}</td>

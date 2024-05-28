@@ -10,18 +10,18 @@ class Supplier extends Model
     use HasFactory;
 
     // table name
-    protected $table = 'supplier';
+    protected $table = 'suppliers';
 
     // fillable attrib
     protected $fillable = [
-        'nama'
+        'name',
     ];
 
 
     public function scopeSearch($query, $request)
     {
         if ($request->q) {
-            $query->where('nama', 'like', '%' . $request->q . '%');
+            $query->where('name', 'like', '%' . $request->q . '%');
         }
         return $query;
     }

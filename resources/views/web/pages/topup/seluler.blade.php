@@ -134,7 +134,7 @@
                     type: "GET",
                     data: {
                         prefix: number,
-                        kategori: '{{$category}}'
+                        category: '{{$category}}'
                     },
                     dataType: "json",
                     beforeSend: function () {
@@ -157,11 +157,11 @@
                             $('#brand').val(response.data.brand.id);
                             response.data.types.forEach(function (type) {
                                 $('#type').append(`
-                                    <option value="${type.id}">${type.nama}</option>
+                                    <option value="${type.id}">${type.name}</option>
                                 `);
                             });
-                            if (response.data.types.find(type => type.nama == 'Umum')) {
-                                $('#type').val(response.data.types.find(type => type.nama == 'Umum').id);
+                            if (response.data.types.find(type => type.name == 'Umum')) {
+                                $('#type').val(response.data.types.find(type => type.name == 'Umum').id);
                                 $('#type').trigger('change');
                             } else {
                                 $('#type').val(response.data.types[0].id);
@@ -212,8 +212,8 @@
                 type: "GET",
                 data: {
                     brand_id: brand,
-                    tipe_id: type,
-                    kategori: '{{$category}}'
+                    type_id: type,
+                    category: '{{$category}}'
                 },
                 beforeSend: function(){
                     $('#products').html('<div class="col-12"><div class="alert alert-info"><i class="fa fa-info-circle"></i> Loading...</div></div>');
@@ -234,23 +234,23 @@
                                     ${product_terlaris.id == product.id ? '<span class="badge badge-info position-absolute" style="top: 0; right: 0; color: white !important; background-color: red !important; font-size: 12px; font-weight: bold;">Terlaris</span>' : ''}
                                     <div class="card-body card-product ${product.status == false ? 'bg-danger text-white gangguan' : ''}"
                                         data-id="${product.id}"
-                                        data-name="${product.nama}"
-                                        data-harga_jual="${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
+                                        data-name="${product.name}"
+                                        data-price_sell="${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
                                             minimumFractionDigits: 0
                                         
-                                        }).format(product.harga)}"
-                                        data-deskripsi="${product.deskripsi}"
+                                        }).format(product.price)}"
+                                        data-description="${product.description}"
                                         data-status="${product.status}">
                                     
-                                        <h2>${product.nama}</h2>
+                                        <h2>${product.name}</h2>
                                         ${product.status == false ? '<b>Produk sedang gangguan</b>' : `<b>
                                             Bayar: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
                                             minimumFractionDigits: 0
                                         
-                                        }).format(product.harga)}
+                                        }).format(product.price)}
                                         </b> <br/>`}
                                         @if($category == 'Data')
-                                        <sub>${product.deskripsi}</sub>
+                                        <sub>${product.description}</sub>
                                         @endif                                      
                                     
                                     </div>
@@ -268,8 +268,8 @@
                             $('#product_id').val($(this).data('id'));
                             $('#show_number').val($('#number').val());
                             $('#show_produk').val($(this).data('name'));
-                            $('#show_price').val($(this).data('harga_jual'));
-                            $('#show_description').val($(this).data('deskripsi'));
+                            $('#show_price').val($(this).data('price_sell'));
+                            $('#show_description').val($(this).data('description'));
                             $('#modalDetail').modal('show');
                             $('#whatsapp').val($('#number').val());
                         });
@@ -307,8 +307,8 @@
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
-                    produk_id: product_id,
-                    nomor: number,
+                    product_id: product_id,
+                    target: number,
                     whatsapp: whatsapp
                 },
                 beforeSend: function(){

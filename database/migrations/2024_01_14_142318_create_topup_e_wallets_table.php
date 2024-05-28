@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('topup_e_wallet', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
             $table->unsignedInteger('topup_id');
-            $table->string('nama_pelanggan');	
-            $table->foreign('topup_id')->references('id')->on('topup')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('customer_name');	
+            $table->foreign('topup_id')->references('id')->on('topups')->onDelete('cascade')->onUpdate('cascade');
         });
         
     }

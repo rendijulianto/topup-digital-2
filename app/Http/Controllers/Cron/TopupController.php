@@ -20,20 +20,20 @@ class TopupController extends Controller
 
                     $params = [
                         'ref_id' => $ref_id,
-                        'buyer_sku_code' => $api->supplier_produk->produk_sku_code,
+                        'buyer_sku_code' => $api->product_suppliers->product_sku_code,
                         'customer_no' => $number,
                     ];
                     $digiflazzService = new DigiflazzService();
                     $createTransaction = DigiflazzService::createTransaction($params);
                     if ($createTransaction['status']) {
                         $api->status = $createTransaction['data']['status'];
-                        $api->keterangan = $createTransaction['data']['message'];
+                        $api->note = $createTransaction['data']['message'];
                         $api->save();
                         $topup->status = $createTransaction['data']['status'];
-                        $topup->keterangan = $createTransaction['data']['sn'] ?? $createTransaction['data']['message'];
+                        $topup->note = $createTransaction['data']['sn'] ?? $createTransaction['data']['message'];
                         if (strtolower($createTransaction['data']['status']) == 'sukses') {
                             if($topup->tipe != 'voucher') {
-                                $topup->tgl_transaksi = date('Y-m-d H:i:s');
+                                $topup->updated_at = date('Y-m-d H:i:s');
                                 PiwapiService::sendMessage($topup->whatsapp, $topup->whatsapp_message);
                             }
                         }
@@ -41,7 +41,7 @@ class TopupController extends Controller
                     } else {
                         // dd($createTransaction);
                         $api->status = 'gagal';
-                        $api->keterangan = $createTransaction['message'];
+                        $api->note = $createTransaction['message'];
                         $api->save();
                         $topup->status = 'gagal';
                         $topup->save();

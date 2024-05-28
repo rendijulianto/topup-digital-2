@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tipe', function (Blueprint $table) {
+        Schema::create('types', function (Blueprint $table) {
             $table->unsignedInteger('id', true);
-            $table->string('nama', 50)->unique();
+            $table->string('name', 50)->unique();
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE tipe MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
+        DB::statement('ALTER TABLE types MODIFY id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT');
     }
 
     /**
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tipe');
+        Schema::dropIfExists('types');
     }
 };

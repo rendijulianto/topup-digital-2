@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 
-use App\Models\{CekNama, Topup,CekVoucher};
+use App\Models\{NameCheck, Topup,VoucherCheck};
 use Illuminate\Http\Request;
-// service Digiflazz
 use App\Services\DigiflazzService;
 set_time_limit(3600);
 class CheckController extends Controller
@@ -15,46 +14,46 @@ class CheckController extends Controller
     public function eWallet(Request $request)
     {   
         $this->validate($request, [
-            'nomor' => 'required|numeric',
-            'brand_id' => 'required|exists:brand,id',
-            'brand' => 'required|string|exists:brand,nama',
+            'target' => 'required|numeric',
+            'brand_id' => 'required|exists:brands,id',
+            'brand' => 'required|string|exists:brands,name',
         ], [
-            'nomor.required' => 'Nomor tidak valid!',
-            'nomor.numeric' => 'Nomor tidak valid!',
+            'target.required' => 'Nomor tidak valid!',
+            'target.numeric' => 'Nomor tidak valid!',
             'brand_id.required' => 'Brand tidak valid!',
             'brand_id.exists' => 'Brand tidak valid!',
         ]);
         
-        $cekNama = CekNama::where([
-            'nomor' => $request->nomor,
+        $nameCheck = NameCheck::where([
+            'target' => $request->target,
             'brand_id' => $request->brand_id,
             'status' => 'sukses',
         ])->whereDate('created_at', '>=', now()->subYear())->first();
     
-        if ($cekNama) {
+        if ($nameCheck) {
             return response()->json([
                 'status' => true,
                 'data' => [
-                    'nomor' => $cekNama->nomor,
-                    'nama' => $cekNama->nama,
+                    'target' => $nameCheck->target,
+                    'name' => $nameCheck->name,
                 ],
             ]);
         }
     
         $ref_id = time().rand(100, 999);
     
-        $cekNama = CekNama::firstOrCreate([
+        $nameCheck = NameCheck::firstOrCreate([
             'brand_id' => $request->brand_id,
-            'nomor' => $request->nomor,
+            'target' => $request->target,
             'status' => 'pending',
         ], [
             'ref_id' => $ref_id,
-            'nama' => '-',
+            'name' => '-',
         ]);
 
         $params = [
             'brand' => $request->brand,
-            'customer_no' => $request->nomor,
+            'customer_no' => $request->target,
             'ref_id' => $ref_id
         ];
 
@@ -70,8 +69,8 @@ class CheckController extends Controller
                     return response()->json([
                         'status' => true,
                         'data' => [
-                            'nomor' => $cekNama->nomor,
-                            'nama' => '-',
+                            'target' => $nameCheck->target,
+                            'name' => '-',
                         ],
                     ], 200);
                 } else {
@@ -83,8 +82,8 @@ class CheckController extends Controller
             }
     
             if ($validateEWallet['data']['status'] == "Sukses") {
-                $cekNama->update([
-                    'nama' => $validateEWallet['data']['sn'],
+                $nameCheck->update([
+                    'name' => $validateEWallet['data']['sn'],
                     'status' => 'sukses',
                 ]);
                 break;
@@ -106,8 +105,8 @@ class CheckController extends Controller
         return response()->json([
             'status' => true,
             'data' => [
-                'nomor' => $cekNama->nomor,
-                'nama' => $cekNama->nama,
+                'target' => $nameCheck->target,
+                'name' => $nameCheck->name,
             ],
         ]);
     }
@@ -115,14 +114,14 @@ class CheckController extends Controller
     public function voucher(Request $request)
     {
 
-      
+     
         $this->validate($request, [
-            'nomor' => 'required|numeric',
-            'brand_id' => 'required|exists:brand,id',
-            'brand' => 'required|string|exists:brand,nama',
+            'target' => 'required|numeric',
+            'brand_id' => 'required|exists:brands,id',
+            'brand' => 'required|string|exists:brands,name',
         ], [
-            'nomor.required' => 'Nomor tidak valid!',
-            'nomor.numeric' => 'Nomor tidak valid!',
+            'target.required' => 'Nomor tidak valid!',
+            'target.numeric' => 'Nomor tidak valid!',
             'brand_id.required' => 'Brand tidak valid!',
             'brand_id.exists' => 'Brand tidak valid!',
             'brand.required' => 'Brand tidak valid!',
@@ -130,8 +129,9 @@ class CheckController extends Controller
         ]);
         
        try {
-        $voucher = Topup::where('nomor', $request->nomor)
-                ->whereIn('status', ['pending', 'sukses'])->where('tipe', 'voucher')->first();
+        $voucher = Topup::where('target', $request->target)->whereIn('status', ['pending', 'sukses'])->where('type', 'voucher')->first();
+
+    
         if(!$voucher) {
             return response()->json([
                 'status' => false,
@@ -140,25 +140,26 @@ class CheckController extends Controller
         }
     
         if($request->brand == "telkomsel") {
-            $nomor = substr($request->nomor, 0, 12);
+            $target = substr($request->target, 0, 12);
         } else {
-            $nomor = $request->nomor;
+            $target = $request->target;
         }
+
 
     
  
-        $cekVoucher = CekVoucher::create([
+        $voucherCheck = VoucherCheck::create([
             'brand_id' => $request->brand_id,
-            'nomor' => $request->nomor,
+            'target' => $request->target,
             'status' => 'pending',
             'ref_id' => time().rand(100, 999),
-            'keterangan' => '-'
+            'note' => '-'
         ]);
 
         $params = [
             'brand' => $request->brand,
-            'customer_no' => $nomor,
-            'ref_id' => $cekVoucher->ref_id
+            'customer_no' => $target,
+            'ref_id' => $voucherCheck->ref_id
         ];
     
     
@@ -174,14 +175,14 @@ class CheckController extends Controller
                 ]);
             }
             if ($validateVoucher['data']['status'] == "Sukses") {
-                $cekVoucher->update([
-                    'keterangan' => $validateVoucher['data']['sn'],
+                $voucherCheck->update([
+                    'note' => $validateVoucher['data']['sn'],
                     'status' => 'sukses',
                 ]);
                 break;
             } else if ($validateVoucher['data']['status'] == "Gagal") {
-                $cekVoucher->update([
-                    'keterangan' => $validateVoucher['data']['message'],
+                $voucherCheck->update([
+                    'note' => $validateVoucher['data']['message'],
                     'status' => 'gagal',
                 ]);
                 return response()->json([
@@ -196,12 +197,12 @@ class CheckController extends Controller
             }
             sleep(2);
         }
-        $histories = CekVoucher::where([
-            'nomor' => $request->nomor,
+        $histories = VoucherCheck::where([
+            'target' => $request->target,
             'brand_id' => $request->brand_id,
-        ])->orderBy('id', 'desc')->get(['keterangan', 'status', 'created_at'])->map(function($item) {
+        ])->orderBy('id', 'desc')->get(['note', 'status', 'created_at'])->map(function($item) {
             return [
-                'keterangan' => $item->keterangan,
+                'note' => $item->note,
                 'status' => $item->status,
                 'created_at' => $item->created_at->format('Y-m-d H:i:s'),
             ];
@@ -209,37 +210,36 @@ class CheckController extends Controller
         return response()->json([
             'status' => true,
             'data' => [
-                'nomor' => $cekVoucher->nomor,
-                'riwayat' => $histories,
+                'target' => $voucherCheck->target,
+                'histories' => $histories,
                 'voucher' => [
-                    'nomor' => $voucher->nomor,
-                    'produk' => $voucher->produk->nama,
-                    'keterangan' => $voucher->keterangan,
-                    'harga_jual' => $voucher->harga_jual,
+                    'target' => $voucher->target,
+                    'product' => $voucher->product->name,
+                    'note' => $voucher->note,
+                    'price_sell' => $voucher->price_sell,
                 ]
-            ],
+            ]
         ]);
        } catch (\Throwable $th) {
               return response()->json([
                 'status' => false,
                 'message' => $th->getMessage(),
-              ], $th->getCode());
+              ], 500);
        }
-
     }
     
     public function pln(Request $request)
     {
         $this->validate($request, [
-             'nomor' => 'required|numeric|digits_between:9,15',
+             'target' => 'required|numeric|digits_between:9,15',
         ], [
-            'nomor.digits_between' => 'Nomor harus diantara 9 sampai 15 digit!',
-            'nomor.numeric' => 'Nomor tidak valid!',
-            'nomor.required' => 'Nomor tidak valid!',
+            'target.digits_between' => 'Nomor harus diantara 9 sampai 15 digit!',
+            'target.numeric' => 'Nomor tidak valid!',
+            'target.required' => 'Nomor tidak valid!',
         ]);
         try {
             $params = [
-                'customer_no' => $request->nomor,
+                'customer_no' => $request->target,
             ];
 
             $iquiryPLN = DigiflazzService::validatePLN($params);

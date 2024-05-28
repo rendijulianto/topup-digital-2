@@ -267,16 +267,16 @@
                                         ${product_terlaris.id == product.id ? '<span class="badge badge-info position-absolute" style="top: 0; right: 0; color: white !important; background-color: red !important; font-size: 12px; font-weight: bold;">Terlaris</span>' : ''}
                                         <div class="card-body card-product disabled opacity-50 ${product.status == false ? 'bg-danger text-white gangguan' : ''}"
                                             data-id="${product.id}"
-                                            data-name="${product.nama}"
-                                            data-selling_price="${product.harga}"
-                                            data-description="${product.deskripsi}"
+                                            data-name="${product.name}"
+                                            data-selling_price="${product.price}"
+                                            data-description="${product.description}"
                                             data-status="${product.status}">
                                         
-                                            <h2>${product.nama}</h2>
+                                            <h2>${product.name}</h2>
                                             ${product.status == false ? '<b>Produk sedang gangguan</b>' : `<b>
                                                 Bayar: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR',
                                                 minimumFractionDigits: 0
-                                            }).format(product.harga)}
+                                            }).format(product.price)}
                                             </b> <br/>`}
                                         </div>
                                     </div>
@@ -347,7 +347,7 @@
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
-                    nomor: number,
+                    target: number,
                     brand_id:brand_id,
                     brand: `{{$brand}}`
                 },
@@ -363,18 +363,13 @@
                 },
                 success: function(response){
                     if(response.status == true){
-                        $('#small_customer_name').html(`<b>${response.data.nama}</b>`);
+                        $('#small_customer_name').html(`<b>${response.data.name}</b>`);
                         $('#show_number').val(response.data.number);
-                        $('#show_name').val(response.data.nama);
+                        $('#show_name').val(response.data.name);
                         $('#show_custom_number').val(response.data.number);
-                        $('#show_custom_name').val(response.data.nama);
+                        $('#show_custom_name').val(response.data.name);
                         $('.card-product').removeClass('disabled opacity-50');
                         $('.card-product-custom').removeClass('disabled opacity-50');
-                        // $('html, body').animate({
-                        //             scrollTop: $('#products').offset().top
-                        //             - 200
-                                    
-                        //         }, 1000);
                     }else{
                         Swal.fire({
                             icon: 'error',
@@ -432,16 +427,16 @@
                     let product_id = $('.card-product.active').data('id');
                     let number = $('#number').val();
                     let whatsapp = $('#whatsapp').val();
-                    let nama_pelanggan = $('#show_name').val();
+                    let customer_name = $('#show_name').val();
                     $.ajax({
                         url: "{{route('api.topups.store')}}",
                         type: "POST",
                         data: {
                             _token: "{{ csrf_token() }}",
-                            produk_id: product_id,
-                            nomor: number,
+                            product_id: product_id,
+                            target: number,
                             whatsapp: whatsapp,
-                            nama_pelanggan: nama_pelanggan
+                            customer_name: customer_name
                         },
                         beforeSend: function(){
                             // progress loading
@@ -462,14 +457,12 @@
                                     confirmButtonText: `OK`,
                                     timer: 2000,
                                 }).then((result) => {
-                                    @if(request()->isGuest == "true")
-                                        id = response.data.id;
-                                        url = "{{route('topup.detail', ['id' => ':id'])}}?isGuest=true";
-                                        url = url.replace(':id', id);
-                                        window.location.href = url;
-                                        @else
-                                        window.location.href = "{{route('cashier.topup')}}";
-                                    @endif
+                                 
+                                    id = response.data.id;
+                                    url = "{{route('topup.detail', ['id' => ':id'])}}?isCustomer=true";
+                                    url = url.replace(':id', id);
+                                    window.location.href = url;
+                               
                                 })
                                 $('#modalDetail').modal('hide');
                                 $('#whatsapp').val('');

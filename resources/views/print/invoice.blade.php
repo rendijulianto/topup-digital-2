@@ -38,21 +38,21 @@
                      <b
                      style="font-size:16pt; margin-left: 10px; color:black;"
                      >
-                        {{$websiteData->nama}}
+                        {{$websiteData->name}}
                   </b>
             
                      </div>
                      <span style='font-size:12pt'>
-                     {{$websiteData->alamat}}
+                     {{$websiteData->address}}
                   </span></br>
                      <span style='font-size:12pt'>
                      Telepon : 
-                     {{$websiteData->nomor_telepon}}
+                     {{$websiteData->telp}}
                      <br />
 
                      {{$topup->created_at->format('d M Y H:i:s')}}
                      <br />
-                     Kasir: {{$topup->kasir->nama}}
+                     Kasir: {{$topup->cashier->name}}
                      </span></br>
                  
                </div>
@@ -87,28 +87,28 @@
          <tr>
             <td width='100px'>Nomor</td>
             <td style="max-width: 150px;">: 
-               {{$topup->nomor}}
+               {{$topup->target}}
             </td>
          </tr>
          @if ($topup->tipe == 'token_listrik')
          <tr>
             <td width='100px'>Nama Pelanggan</td>
             <td style="max-width: 150px;">: 
-               {{$topup->token_listrik->nama_pelanggan}}
+               {{$topup->token_listrik->customer_name}}
             </td>
          </tr>
          {{-- id_pelanggan --}}
          <tr>
             <td width='100px'>ID Pelanggan</td>
             <td style="max-width: 150px;">: 
-               {{$topup->token_listrik->id_pelanggan}}
+               {{$topup->token_listrik->subscriber_id}}
             </td>
          </tr>
          {{-- nomor meter --}}
          <tr>
             <td width='100px'>Nomor Meter</td>
             <td style="max-width: 150px;">: 
-               {{$topup->token_listrik->nomor_meter}}
+               {{$topup->token_listrik->meter_no}}
             </td>
          </tr>
          {{-- daya --}}
@@ -122,20 +122,20 @@
          <tr>
             <td width='100px'>Nama Pelanggan</td>
             <td style="max-width: 150px;">: 
-               {{$topup->e_wallet->nama_pelanggan}}
+               {{$topup->e_wallet->customer_name}}
             </td>
          </tr>
          @endif
          <tr>
             <td width='100px'>Produk</td>
             <td style="max-width: 150px;">: 
-               {{$topup->produk->nama}}
+               {{$topup->product->nama}}
             </td>
          </tr>
          <tr>
             <td width='100px'>Harga</td>
             <td>: 
-               Rp. {{number_format($topup->harga_jual, 0, ',', '.')}}
+               Rp. {{number_format($topup->price_sell, 0, ',', '.')}}
             </td>
          </tr>
          <tr>
@@ -156,7 +156,7 @@
                   class="nowrap"
                   >
                   @php 
-                  $token = explode('/', $topup->keterangan);
+                  $token = explode('/', $topup->note);
                   @endphp
                   {{$token[0]}}
              
@@ -172,7 +172,7 @@
                   
                   class="nowrap"
                   >
-                  {{$topup->keterangan}}
+                  {{$topup->note}}
                </span>
             </td>
          </tr>

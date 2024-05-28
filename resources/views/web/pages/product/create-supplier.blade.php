@@ -5,8 +5,8 @@
                 
                     <div class="row">
                         <div class="mb-3 col-12">
-                            <label for="nama" class="form-label">Nama Produk</label>
-                            <input type="text" name="nama" id="nama" readonly class="form-control @error('nama') is-invalid @enderror" placeholder="Masukkan nama" value="{{$product->nama}}">
+                            <label for="name" class="form-label">Nama Produk</label>
+                            <input type="text" name="name" id="name" readonly class="form-control @error('name') is-invalid @enderror" placeholder="Masukkan name" value="{{$product->name}}">
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
@@ -19,24 +19,24 @@
                                     @if (old('supplier_id') == $supplier->id)
                                         selected
                                     @endif 
-                                    value="{{$supplier->id}}">{{$supplier->nama}}</option>
+                                    value="{{$supplier->id}}">{{$supplier->name}}</option>
                                 @endforeach
                             </select>
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
-                            <label for="produk_sku_code" class="form-label">
+                            <label for="product_sku_code" class="form-label">
                                 <i class="fa fa-info-circle" data-bs-toggle="tooltip" 
                                 data-bs-placement="top" title="Produk Sku Kode adalah kode yang ada di produk digiflazz"></i>
                           
                                 Produk Sku Kode
                             </label>
-                            <input type="text" name="produk_sku_code" id="produk_sku_code" class="form-control @error('produk_sku_code') is-invalid @enderror" placeholder="Masukkan Produk Sku Kode" value="{{$product->produk_sku_code}}">
+                            <input type="text" name="product_sku_code" id="product_sku_code" class="form-control @error('product_sku_code') is-invalid @enderror" placeholder="Masukkan Produk Sku Kode" value="{{$product->product_sku_code}}">
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
-                            <label for="harga" class="form-label">Harga</label>
-                            <input type="number" name="harga" id="harga" class="form-control @error('price') is-invalid @enderror" placeholder="Masukkan price" value="{{old('harga')}}">
+                            <label for="price" class="form-label">Harga</label>
+                            <input type="number" name="price" id="price" class="form-control @error('price') is-invalid @enderror" placeholder="Masukkan harga" value="{{old('price')}}">
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
@@ -48,8 +48,8 @@
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
-                            <label for="stok" class="form-label">Stok</label>
-                            <input type="number" name="stok" id="stok" class="form-control @error('stok') is-invalid @enderror" placeholder="Masukkan price" value="{{old('stok')}}">
+                            <label for="stock" class="form-label">Stok</label>
+                            <input type="number" name="stock" id="stock" class="form-control @error('stock') is-invalid @enderror" placeholder="Masukkan stok" value="{{old('stock')}}">
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
@@ -61,16 +61,15 @@
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
-                            <label for="jam_tutup" class="form-label">Jam Tutup</label>
-                            <input type="time" name="jam_tutup" id="jam_tutup" class="form-control @error('jam_tutup') is-invalid @enderror" placeholder="Masukkan price" value="{{old('jam_tutup')}}">
+                            <label for="start_cut_off" class="form-label">Jam Tutup</label>
+                            <input type="time" name="start_cut_off" id="start_cut_off" class="form-control @error('start_cut_off') is-invalid @enderror" placeholder="Masukkan price" value="{{old('start_cut_off')}}">
                             <small class="text-danger"></small>
                         </div>
                         <div class="mb-3 col-12 col-lg-6">
-                            <label for="jam_buka" class="form-label">Jam Buka</label>
-                            <input type="time" name="jam_buka" id="jam_buka" class="form-control @error('jam_buka') is-invalid @enderror" placeholder="Masukkan price" value="{{old('jam_buka')}}">
+                            <label for="end_cut_off" class="form-label">Jam Buka</label>
+                            <input type="time" name="end_cut_off" id="end_cut_off" class="form-control @error('end_cut_off') is-invalid @enderror" placeholder="Masukkan price" value="{{old('end_cut_off')}}">
                             <small class="text-danger"></small>
                         </div>
                     </div>
-                   
                 </form>
           

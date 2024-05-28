@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pengguna;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-use App\Models\{Topup, Brand, Kategori, Produk, Supplier, Tipe};
+use App\Models\{Topup, Brand, Category, Product, Supplier, Type};
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 class TopupController extends Controller
@@ -14,7 +14,7 @@ class TopupController extends Controller
 
     public function index(Request $request)
     {   
-        $user = Auth::guard('pengguna')->user();
+        $user = Auth::guard()->user();
 
         if ($request->start && $request->end) {
             $start = Carbon::parse($request->start);
@@ -28,14 +28,14 @@ class TopupController extends Controller
 
         $statusCounts = Topup::search($request)
 
-        ->with('produk')
+        ->with('product')
         ->latest()
         ->get()
         ->groupBy('status')
         ->map(function ($group) {
             return [
-                'total' => $group->sum('harga_jual'),
-                'total_buy' => $group->sum('harga_beli'),
+                'total' => $group->sum('price_sell'),
+                'total_buy' => $group->sum('price_buy'),
                 'count' => $group->count(),
             ];
         });
@@ -58,19 +58,19 @@ class TopupController extends Controller
     // Menghitung total profit
     $totalProfit = $totalSuccess - ($statusCounts['sukses']['total_buy'] ?? 0);
     
-    $products = Produk::orderBy('nama', 'asc')->get();
-    $brands = Brand::orderBy('nama', 'asc')->get();
-    $types = Tipe::orderBy('nama', 'asc')->get();
-    $categories = Kategori::orderBy('nama', 'asc')->get();
-    $suppliers = Supplier::orderBy('nama', 'asc')->get();
-    $users = Pengguna::orderBy('nama', 'asc')->get();
+    $products = Product::orderBy('name', 'asc')->get();
+    $brands = Brand::orderBy('name', 'asc')->get();
+    $types = Type::orderBy('name', 'asc')->get();
+    $categories = Category::orderBy('name', 'asc')->get();
+    $suppliers = Supplier::orderBy('name', 'asc')->get();
+    $users = User::orderBy('name', 'asc')->get();
     
     // Mendapatkan data dengan paginasi
     $topups = Topup::search($request)
-        ->where('tgl_transaksi', '!=', null)
-        ->with('produk')
+        ->where('transacted_at', '!=', null)
+        ->with('product')
 
-        ->orderby('tgl_transaksi', 'desc')
+        ->orderby('transacted_at', 'desc')
         ->paginate(config('app.pagination.default'));
 
         return view('web.pages.topup.index', compact(
@@ -129,14 +129,14 @@ class TopupController extends Controller
 
     public function detail(Request $request, $id)
     {
-        $topup = Topup::with('produk')->findOrFail($id);
+        $topup = Topup::with('product')->findOrFail($id);
         return view('web.pages.topup.detail', compact('topup'));
     }
 
 
     public function cashier(Request $request)
     {
-        $user = auth()->guard('pengguna')->user();	
+        $user = auth()->guard()->user();	
         if ($request->start && $request->end) {
             $start = Carbon::parse($request->start);
             $end = Carbon::parse($request->end);
@@ -146,23 +146,23 @@ class TopupController extends Controller
             $request->start = $start->format('Y-m-d');
             $request->end = $end->format('Y-m-d');
         }
-        $products = Produk::orderBy('nama', 'asc')->get();
+        $products = Product::orderBy('name', 'asc')->get();
         $queryTopup = Topup::search($request)
-        ->where('tgl_transaksi', '!=', null)
-        ->where('kasir_id', $user->id);
+        ->where('transacted_at', '!=', null)
+        ->where('cashier_id', $user->id);
        
         
         $dataTopup = $queryTopup->get()
         ->groupBy('status')
         ->map(function ($group) {
             return [
-                'total' => $group->sum('harga_jual'),
-                'total_buy' => $group->sum('harga_beli'),
+                'total' => $group->sum('price_sell'),
+                'total_buy' => $group->sum('price_buy'),
                 'count' => $group->count(),
             ];
         });
 
-        $topups = $queryTopup->orderBy('tgl_transaksi', 'desc')->with('produk')
+        $topups = $queryTopup->orderBy('transacted_at', 'desc')->with('product')
         ->paginate(config('app.pagination.default'));
 
 
@@ -199,8 +199,8 @@ class TopupController extends Controller
 
     public function voucherCheck(Request $request)
     {
-        $brands = Brand::select('id', 'nama', 'slug','logo')->category('aktivasi-voucher')
-        ->orderBy('nama', 'asc')->get();
+        $brands = Brand::select('id', 'name','logo')->category('aktivasi-voucher')
+        ->orderBy('name', 'asc')->get();
        
         return view('web.pages.topup.voucher-check', compact('brands'));
     }

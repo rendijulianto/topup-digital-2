@@ -19,7 +19,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h4 class="card-title">
-                    <i class="ri-list"></i>
+                <i class="ri-list-check-2"></i>
                     Daftar Tipe</h4>
 
                     <button id="btnModalTambah" class="btn btn-secondary btn-sm"><i class="fa fa-plus"></i> Tambah</button>
@@ -55,7 +55,7 @@
                                         @forelse ($types as $type)
                                         <tr>
                                             <th>{{ ($loop->index + 1) + ($types->currentPage() - 1) * $types->perPage() }}</th>
-                                            <td>{{$type->nama}}</td>
+                                            <td>{{$type->name}}</td>
                                             <td>
                                                 <a 
                                                 onclick="handleEdit({{$type->id}})"

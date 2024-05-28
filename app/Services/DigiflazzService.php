@@ -58,6 +58,7 @@ class DigiflazzService
         try {
             $params['buyer_sku_code'] = strtoupper($params['brand']);
             $params['buyer_sku_code'] = str_replace(' ', '', $params['buyer_sku_code']).'_CEK';
+       
             $validateEWallet = DigiflazzService::createTransaction($params);
             return $validateEWallet;
         } catch (\Throwable $th) {
@@ -80,8 +81,8 @@ class DigiflazzService
             return [
                 'status' => true,
                 'data' => [
-                    'nomor' => $iquiryPLN->customer_no,
-                    'nama' => $iquiryPLN->name,
+                    'target' => $iquiryPLN->customer_no,
+                    'name' => $iquiryPLN->name,
                     'segment_power' => $iquiryPLN->segment_power,
                     'subscriber_id' => $iquiryPLN->subscriber_id,
                     'meter_no' => $iquiryPLN->meter_no,
